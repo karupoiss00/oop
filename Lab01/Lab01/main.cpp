@@ -53,5 +53,5 @@ void Copyfile(string& inputFileName, string& outputFileName)
 
 	outputFile.close();
 	inputFile.close();
-	cout << "File " << inputFileName << " copied in " << outputFileName << endl;
+	cout << "Файл " << inputFileName << " скопирован " << outputFileName << endl;
 }
