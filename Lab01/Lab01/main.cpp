@@ -1,57 +1,123 @@
-#include <stdio.h>
-#include <tchar.h>
 #include <iostream>
-#include <string>
 #include <fstream>
-#include <utility>
-#include <stdlib.h>
-#include <windows.h>
-#include <time.h>
+#include <optional>
+#include <string>
+#include <algorithm>
+#include <boost/algorithm/searching/knuth_morris_pratt.hpp>
 
 using namespace std;
+using namespace boost;
+using namespace boost::algorithm;
 
-void Copyfile(string& inputFileName, string& outputFileName);
- 
-int main(int argc, char** argv)
+struct Args
 {
-	setlocale(LC_ALL, "RU");
+	string inputFileName;
+	string outputFileName;
+	string searchString;
+	string replaceString;
+};
 
-	if (argc < 2)
+optional<Args> ParseArgs(int argc, char* argv[]);
+string Replace(const string& src, const string& pattern, const string& replace);
+
+int main(int argc, char* argv[])
+{
+	auto args = ParseArgs(argc, argv);
+
+	if (!args)
 	{
-		cout << "Неверные входные параметры!" << endl;
-		cout << "Используйте: Copyfile.exe <имя входного файла> <имя выходного файла>" << endl;
 		return 1;
 	}
 
-	string inputFileName = argv[1];
-	string outputFileName = argv[2];
+	string sourceLine;
+	string pattern = argv[3];
+	string replace = argv[4];
+	
 
-	Copyfile(inputFileName, outputFileName);
-}
-
-void Copyfile(string& inputFileName, string& outputFileName)
-{
-	ifstream inputFile(inputFileName, ios_base::in);
-	ofstream outputFile(outputFileName, ios_base::out, ios_base::trunc);
-
-	int length;
-	char* buffer;
-
-	if (!inputFile.is_open() && !outputFile.is_open())
+	ifstream input;
+	input.open(args->inputFileName);
+	
+	if (pattern.length() == 0)
 	{
-		cout << "Ошибка открытия одного из файлов" << endl;
-		exit(1);
+		cout << "Argument <search string> should not be empty" << endl;
+		return 1;
 	}
 
-	inputFile.seekg(0, inputFile.end);
-	length = static_cast<unsigned int>(inputFile.tellg());
-	inputFile.seekg(0, inputFile.beg);
-	buffer = new char[length];
+	if (!input.is_open())
+	{
+		cout << "Failed to open '" << args->inputFileName << "' for reading\n";
+		return 1;
+	}
 
-	inputFile.read(buffer, length);
-	outputFile.write(buffer, static_cast<streamoff>(length));
+	ofstream output;
+	output.open(args->outputFileName);
 
-	outputFile.close();
-	inputFile.close();
-	cout << "Файл " << inputFileName << " скопирован " << outputFileName << endl;
+	if (!output.is_open())
+	{
+		cout << "Failed to open '" << args->outputFileName << "' for writing\n";
+		return 1;
+	}
+
+
+	while (getline(input, sourceLine))
+	{
+		output << Replace(sourceLine, pattern, replace);
+		if (!input.eof())
+		{
+			output << endl;
+		}
+	}
+
+
+	if (input.bad())
+	{
+		cout << "Falied to read data from input file\n";
+		return 1;
+	}
+
+	if (!output.flush())
+	{
+		cout << "Failed to write data to output file\n";
+		return 1;
+	}
+
+	return 0;
+}
+
+optional<Args> ParseArgs(int argc, char* argv[])
+{
+	if (argc != 5)
+	{
+		cout << "Invalid arguments count\n";
+		cout << "Usage: Replace.exe <input file name> <output file name> <search string> <replace string>\n";
+		return nullopt;
+	}
+
+	Args args;
+	args.inputFileName = argv[1];
+	args.outputFileName = argv[2];
+	args.searchString = argv[3];
+	args.replaceString = argv[4];
+
+	return args;
+}
+
+string Replace(const string& src, const string& pattern, const string& replace)
+{
+	string replacedSrc;
+
+	auto searchForPattern = make_knuth_morris_pratt(pattern);
+	string::const_iterator prevPos = src.cbegin();
+	string::const_iterator nextPos = searchForPattern(prevPos, src.cend());
+
+	while (nextPos != src.cend())
+	{
+		replacedSrc += src.substr(prevPos - src.cbegin(), nextPos - prevPos);
+		replacedSrc += replace;
+		prevPos = nextPos + pattern.length();
+		nextPos = searchForPattern(prevPos, src.cend());
+	}
+
+	replacedSrc += src.substr(prevPos - src.cbegin(), src.cend() - prevPos);
+	return replacedSrc;
 }
