@@ -19,6 +19,7 @@ struct Args
 
 optional<Args> ParseArgs(int argc, char* argv[]);
 string Replace(const string& src, const string& pattern, const string& replace);
+void Replace(ifstream& input, ofstream& output, const string& pattern, const string& replace);
 
 int main(int argc, char* argv[])
 {
@@ -30,12 +31,8 @@ int main(int argc, char* argv[])
 	}
 
 	string sourceLine;
-	string pattern = argv[3];
-	string replace = argv[4];
-	
-
-	ifstream input;
-	input.open(args->inputFileName);
+	string pattern = args->searchString;
+	string replace = args->replaceString;
 	
 	if (pattern.length() == 0)
 	{
@@ -43,11 +40,15 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
+	ifstream input;
+	input.open(args->inputFileName);
+	
 	if (!input.is_open())
 	{
 		cout << "Failed to open '" << args->inputFileName << "' for reading\n";
 		return 1;
 	}
+
 
 	ofstream output;
 	output.open(args->outputFileName);
@@ -59,14 +60,7 @@ int main(int argc, char* argv[])
 	}
 
 
-	while (getline(input, sourceLine))
-	{
-		output << Replace(sourceLine, pattern, replace);
-		if (!input.eof())
-		{
-			output << endl;
-		}
-	}
+	Replace(input, output, pattern, replace);
 
 
 	if (input.bad())
@@ -120,4 +114,17 @@ string Replace(const string& src, const string& pattern, const string& replace)
 
 	replacedSrc += src.substr(prevPos - src.cbegin(), src.cend() - prevPos);
 	return replacedSrc;
+}
+
+void Replace(ifstream& input, ofstream& output, const string& pattern, const string& replace)
+{
+	string src;
+	while (getline(input, src))
+	{
+		output << Replace(src, pattern, replace);
+		if (!input.eof())
+		{
+			output << endl;
+		}
+	}
 }
