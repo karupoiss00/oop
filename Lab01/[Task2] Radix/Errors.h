@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 enum Errors
 {
@@ -8,3 +9,5 @@ enum Errors
 	INVALID_RADIX,
 	OUT_OF_RANGE
 };
+
+std::string GetErrorMessage(int errorCode);

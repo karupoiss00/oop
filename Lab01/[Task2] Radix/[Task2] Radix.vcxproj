@@ -144,10 +144,15 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Errors.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="StringIntCasts.cpp" />
+    <ClCompile Include="Translations.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Errors.h" />
+    <ClInclude Include="StringIntCasts.h" />
+    <ClInclude Include="Translations.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
