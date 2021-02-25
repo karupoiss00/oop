@@ -2,7 +2,7 @@
 
 using namespace std;
 
-unsigned PreporationToConverting(string& str, unsigned radix, unsigned& power, bool& isNegative)
+unsigned PreporationToConverting(string& str, unsigned radix, unsigned& radixInMaxPow, bool& isNegative)
 {
 	isNegative = false;
 
@@ -30,8 +30,8 @@ unsigned PreporationToConverting(string& str, unsigned radix, unsigned& power, b
 	}
 
 	bool wasError;
-	size_t exponent = str.length() - 1;
-	power = RadixInMaxPower(radix, exponent, isNegative, wasError);
+	size_t maxExponent = str.length() - 1;
+	radixInMaxPow = RadixInMaxPower(radix, maxExponent, isNegative, wasError);
 
 	if (wasError)
 	{
@@ -69,10 +69,10 @@ int StringToInt(string str, unsigned radix, bool& wasError)
 {
 	wasError = false;
 	unsigned result;
-	unsigned power;
+	unsigned radixInMaxPow;
 	bool isNegative;
 
-	if (result = PreporationToConverting(str, radix, power, isNegative))
+	if (result = PreporationToConverting(str, radix, radixInMaxPow, isNegative))
 	{
 		wasError = true;
 		return result;
@@ -89,14 +89,14 @@ int StringToInt(string str, unsigned radix, bool& wasError)
 			break;
 		}
 
-		if (!CanAccumulate(result, digit, power, isNegative))
+		if (!CanAccumulate(result, digit, radixInMaxPow, isNegative))
 		{
 			wasError = true;
 			result = Errors::VALUE_OVERFLOW;
 			break;
 		}
 
-		power = power / radix;
+		radixInMaxPow = radixInMaxPow / radix;
 	}
 
 	if (wasError)
@@ -141,15 +141,15 @@ string IntToString(int number, unsigned radix, string& errorMsg)
 		int digit = uintNumber % radix;
 		uintNumber = uintNumber / radix;
 
-		char ch = IntToChar(digit);
+		char digitCh = IntToChar(digit);
 
-		if (!ch)
+		if (!digitCh)
 		{
 			errorMsg = "Unable to convert number into character";
 			return "";
 		}
 
-		result.insert(result.begin(), ch);
+		result.insert(result.begin(), digitCh);
 
 	} while (uintNumber > 0);
 
