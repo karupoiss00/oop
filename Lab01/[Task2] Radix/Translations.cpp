@@ -52,18 +52,18 @@ int RadixInMaxPower(unsigned radix, unsigned maxExponent, bool isNegative, bool&
 }
 
 
-bool CanAccumulate(unsigned& result, unsigned digit, unsigned power, bool isNegative)
+bool CanAccumulate(unsigned& result, unsigned digit, unsigned radixInMaxPow, bool isNegative)
 {
 	int maxValue = isNegative ? INT_MIN : INT_MAX;
 
-	bool overflowDuringMultiplication = digit > maxValue / power;
-	bool overflowDuringAddition = result > maxValue - digit * power;
+	bool overflowDuringMultiplication = digit > maxValue / radixInMaxPow;
+	bool overflowDuringAddition = result > maxValue - digit * radixInMaxPow;
 
 	if (overflowDuringMultiplication || overflowDuringAddition)
 	{
 		return false;
 	}
 
-	result += digit * power;
+	result += digit * radixInMaxPow;
 	return true;
 }
