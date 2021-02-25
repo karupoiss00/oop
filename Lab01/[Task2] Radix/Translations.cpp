@@ -24,13 +24,24 @@ string ConvertNumber(const string& numberStr, unsigned fromRadix, unsigned toRad
 	return converted;
 }
 
-int RadixInMaxPower(unsigned radix, int maxExponent, bool isNegative, bool& wasError)
+int RadixInMaxPower(unsigned radix, unsigned maxExponent, bool isNegative, bool& wasError)
 {
 	wasError = false;
-	double maxPowerValue = pow(static_cast<float>(radix), maxExponent);
-	unsigned int maxValue = INT_MAX;
+	int maxPowerValue = 1;
+	int maxValue = isNegative ? INT_MIN : INT_MAX;
+	bool highestNumberValueOfRadixBiggerThanMaxInt = false;
 
-	bool highestNumberValueOfRadixBiggerThanMaxInt = maxPowerValue > maxValue;
+	for (size_t i = 0; i < maxExponent; i++)
+	{
+		if (maxValue / radix > maxPowerValue)
+		{
+			maxPowerValue *= radix;
+		}
+		else
+		{
+			highestNumberValueOfRadixBiggerThanMaxInt = true;
+		}
+	}
 
 	if (highestNumberValueOfRadixBiggerThanMaxInt)
 	{
@@ -43,7 +54,7 @@ int RadixInMaxPower(unsigned radix, int maxExponent, bool isNegative, bool& wasE
 
 bool CanAccumulate(unsigned& result, unsigned digit, unsigned power, bool isNegative)
 {
-	unsigned int maxValue = isNegative ? INT_MAX + 1: INT_MAX;
+	int maxValue = isNegative ? INT_MIN : INT_MAX;
 
 	bool overflowDuringMultiplication = digit > maxValue / power;
 	bool overflowDuringAddition = result > maxValue - digit * power;
