@@ -17,8 +17,8 @@ struct Args
 };
 
 optional<Args> ParseArgs(int argc, char* argv[]);
-bool ReadMatrixFromFile(string fileName, Matrix3x3& matrix);
-bool Invert(Matrix3x3& matrix, Matrix3x3& invertMatrix);
+bool ReadMatrixFromFile(const string& fileName, Matrix3x3& matrix);
+bool Invert(const Matrix3x3& matrix, Matrix3x3& invertMatrix);
 void PrintMatrix(const Matrix3x3& matrix);
 
 int main(int argc, char* argv[])
@@ -91,14 +91,14 @@ bool __stdcall StrToLong(const string& str, long& number)
 	return true;
 }
 
-bool ReadMatrixFromFile(string filename, Matrix3x3& matrix)
+bool ReadMatrixFromFile(const string& fileName, Matrix3x3& matrix)
 {
 	ifstream input;
-	input.open(filename);
+	input.open(fileName);
 
 	if (!input.is_open())
 	{
-		cout << "Failed to open '" << filename << "' for reading\n";
+		cout << "Failed to open '" << fileName << "' for reading\n";
 		return false;
 	}
 
@@ -128,6 +128,11 @@ bool ReadMatrixFromFile(string filename, Matrix3x3& matrix)
 		}
 
 		++matrixLineNum;
+		
+		if (matrixLineNum > 2)
+		{
+			break;
+		}
 	}
 
 	if (matrixLineNum != 3)
@@ -206,7 +211,7 @@ void CloneMatrix(const Matrix3x3& matrix, Matrix3x3& matrixClone)
 	}
 }
 
-void MatrixOfAlgebraicAdditions(const Matrix3x3& matrix, Matrix3x3& addMatrix)
+void AdjugateOfMatrix(const Matrix3x3& matrix, Matrix3x3& addMatrix)
 {
 	CloneMatrix(matrix, addMatrix);
 
@@ -227,7 +232,7 @@ void TransposeMatrix(const Matrix3x3& matrix, Matrix3x3& transposedMatrix)
 	}
 }
 
-bool Invert(Matrix3x3& matrix, Matrix3x3& invertMatrix)
+bool Invert(const Matrix3x3& matrix, Matrix3x3& invertMatrix)
 {
 	float determinant = MatrixDeterminant(matrix);
 
@@ -240,7 +245,7 @@ bool Invert(Matrix3x3& matrix, Matrix3x3& invertMatrix)
 	MinorOfMatrix(matrix, minor);
 
 	Matrix3x3 additionsMinor;
-	MatrixOfAlgebraicAdditions(minor, additionsMinor);
+	AdjugateOfMatrix(minor, additionsMinor);
 
 	Matrix3x3 transpAddMinor;
 	TransposeMatrix(additionsMinor, transpAddMinor);
