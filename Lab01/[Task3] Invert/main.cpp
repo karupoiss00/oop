@@ -8,8 +8,8 @@
 
 using namespace std;
 
-typedef float Matrix2x2[2][2];
-typedef float Matrix3x3[3][3];
+typedef double Matrix2x2[2][2];
+typedef double Matrix3x3[3][3];
 
 struct Args
 {
@@ -78,9 +78,9 @@ void PrintMatrix(const Matrix3x3& matrix)
 	}
 }
 
-bool __stdcall StrToLong(const string& str, long& number)
+bool __fastcall StrToFloat(const string& str, double& number)
 {
-	number = strtol(str.c_str(), NULL, 10);
+	number = strtod(str.c_str(), NULL);
 
 	//проверка на переполнение после перевода строки в число
 	if (errno == ERANGE)
@@ -107,7 +107,7 @@ bool ReadMatrixFromFile(const string& fileName, Matrix3x3& matrix)
 
 	string matrixLine;
 	unsigned matrixLineNum = 0;
-	long element;
+	double element;
 	
 	while (getline(input, matrixLine))
 	{
@@ -118,12 +118,12 @@ bool ReadMatrixFromFile(const string& fileName, Matrix3x3& matrix)
 				return false;
 			}
 			
-			if (!StrToLong(searchResult.str(), element))
+			if (!StrToFloat(searchResult.str(), element))
 			{
 				return false;
 			}
 
-			matrix[matrixLineNum][i] = static_cast<float>(element);
+			matrix[matrixLineNum][i] = element;
 			matrixLine = searchResult.suffix().str();
 		}
 
@@ -143,9 +143,9 @@ bool ReadMatrixFromFile(const string& fileName, Matrix3x3& matrix)
 	return true;
 }
 
-float MatrixDeterminant(const Matrix3x3& matrix)
+double MatrixDeterminant(const Matrix3x3& matrix)
 {
-	float determinant = 0;
+	double determinant = 0;
 
 	determinant = matrix[0][0] * matrix[1][1] * matrix[2][2];
 	determinant += matrix[2][0] * matrix[0][1] * matrix[1][2];
@@ -234,7 +234,7 @@ void TransposeMatrix(const Matrix3x3& matrix, Matrix3x3& transposedMatrix)
 
 bool Invert(const Matrix3x3& matrix, Matrix3x3& invertMatrix)
 {
-	float determinant = MatrixDeterminant(matrix);
+	double determinant = MatrixDeterminant(matrix);
 
 	if (!determinant)
 	{
