@@ -27,8 +27,6 @@ int main(int argc, char* argv[])
 
 	if (!args)
 	{
-		cout << endl << "Invalid arguments count" << endl;
-		cout << "Usage: invert.exe <matrix file>" << endl;
 		return 1;
 	}
 
