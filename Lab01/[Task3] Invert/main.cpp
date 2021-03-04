@@ -103,7 +103,7 @@ bool ReadMatrixFromFile(const string& fileName, Matrix3x3& matrix)
 	}
 
 	smatch searchResult;
-	regex rgx("-{0,1}\\d+");
+	regex rgx("[+-]?([0-9]*[.])?[0-9]+");
 
 	string matrixLine;
 	unsigned matrixLineNum = 0;
@@ -157,7 +157,7 @@ double MatrixDeterminant(const Matrix3x3& matrix)
 	return determinant;
 }
 
-float MinorOfElement(const Matrix3x3& matrix, unsigned elemLineNumber, unsigned elemColumnNumber)
+double MinorOfElement(const Matrix3x3& matrix, unsigned elemLineNumber, unsigned elemColumnNumber)
 {
 	Matrix2x2 matrix2x2;
 	unsigned line2x2 = 0;
