@@ -78,7 +78,7 @@ void PrintMatrix(const Matrix3x3& matrix)
 	}
 }
 
-bool __fastcall StrToFloat(const string& str, double& number)
+bool __fastcall StrToDouble(const string& str, double& number)
 {
 	number = strtod(str.c_str(), NULL);
 
@@ -118,7 +118,7 @@ bool ReadMatrixFromFile(const string& fileName, Matrix3x3& matrix)
 				return false;
 			}
 			
-			if (!StrToFloat(searchResult.str(), element))
+			if (!StrToDouble(searchResult.str(), element))
 			{
 				return false;
 			}
