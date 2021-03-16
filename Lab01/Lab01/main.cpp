@@ -1,25 +1,25 @@
 #include <iostream>
+#include <iomanip>
 #include <fstream>
-#include <optional>
 #include <string>
-#include <algorithm>
-#include <boost/algorithm/searching/knuth_morris_pratt.hpp>
+#include <regex>
+#include <climits>
+#include <optional>
 
 using namespace std;
-using namespace boost;
-using namespace boost::algorithm;
+
+typedef float Matrix2x2[2][2];
+typedef float Matrix3x3[3][3];
 
 struct Args
 {
-	string inputFileName;
-	string outputFileName;
-	string searchString;
-	string replaceString;
+	string matrixFileName;
 };
 
 optional<Args> ParseArgs(int argc, char* argv[]);
-string Replace(const string& src, const string& pattern, const string& replace);
-void Replace(ifstream& input, ofstream& output, const string& pattern, const string& replace);
+bool ReadMatrixFromFile(const string& fileName, Matrix3x3& matrix);
+bool Invert(const Matrix3x3& matrix, Matrix3x3& invertMatrix);
+void PrintMatrix(const Matrix3x3& matrix);
 
 int main(int argc, char* argv[])
 {
@@ -30,101 +30,233 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	string sourceLine;
-	string pattern = args->searchString;
-	string replace = args->replaceString;
-	
-	if (pattern.length() == 0)
+	Matrix3x3 matrix;
+	Matrix3x3 invertedMatrix;
+
+	if (!ReadMatrixFromFile(args->matrixFileName, matrix))
 	{
-		cout << "Argument <search string> should not be empty" << endl;
+		cout << "Failed to read matrix" << endl;
 		return 1;
 	}
 
-	ifstream input;
-	input.open(args->inputFileName);
-	
-	if (!input.is_open())
+	if (!Invert(matrix, invertedMatrix))
 	{
-		cout << "Failed to open '" << args->inputFileName << "' for reading\n";
+		cout << "Failed to invert matrix" << endl;
 		return 1;
 	}
 
-
-	ofstream output;
-	output.open(args->outputFileName);
-
-	if (!output.is_open())
-	{
-		cout << "Failed to open '" << args->outputFileName << "' for writing\n";
-		return 1;
-	}
-
-
-	Replace(input, output, pattern, replace);
-
-
-	if (input.bad())
-	{
-		cout << "Falied to read data from input file\n";
-		return 1;
-	}
-
-	if (!output.flush())
-	{
-		cout << "Failed to write data to output file\n";
-		return 1;
-	}
+	PrintMatrix(invertedMatrix);
 
 	return 0;
 }
 
 optional<Args> ParseArgs(int argc, char* argv[])
 {
-	if (argc != 5)
+	if (argc != 2)
 	{
-		cout << "Invalid arguments count\n";
-		cout << "Usage: Replace.exe <input file name> <output file name> <search string> <replace string>\n";
+		cout << "Invalid arguments count" << endl;
+		cout << "Usage: Invert.exe <matrix file name>" << endl;
 		return nullopt;
 	}
 
 	Args args;
-	args.inputFileName = argv[1];
-	args.outputFileName = argv[2];
-	args.searchString = argv[3];
-	args.replaceString = argv[4];
-
+	args.matrixFileName = argv[1];
 	return args;
 }
 
-string Replace(const string& src, const string& pattern, const string& replace)
+void PrintMatrix(const Matrix3x3& matrix)
 {
-	string replacedSrc;
-
-	auto searchForPattern = make_knuth_morris_pratt(pattern);
-	string::const_iterator prevPos = src.cbegin();
-	string::const_iterator nextPos = searchForPattern(prevPos, src.cend());
-
-	while (nextPos != src.cend())
+	cout << fixed << setprecision(3);
+	cout << endl;
+	for (unsigned line = 0; line < 3; ++line)
 	{
-		replacedSrc += src.substr(prevPos - src.cbegin(), nextPos - prevPos);
-		replacedSrc += replace;
-		prevPos = nextPos + pattern.length();
-		nextPos = searchForPattern(prevPos, src.cend());
+		for (unsigned column = 0; column < 3; ++column)
+		{
+			cout << fixed << matrix[line][column] << "\t";
+		}
+		cout << endl;
 	}
-
-	replacedSrc += src.substr(prevPos - src.cbegin(), src.cend() - prevPos);
-	return replacedSrc;
 }
 
-void Replace(ifstream& input, ofstream& output, const string& pattern, const string& replace)
+bool __stdcall StrToLong(const string& str, long& number)
 {
-	string src;
-	while (getline(input, src))
+	number = strtol(str.c_str(), NULL, 10);
+
+	//проверка на переполнение после перевода строки в число
+	if (errno == ERANGE)
 	{
-		output << Replace(src, pattern, replace);
-		if (!input.eof())
+		return false;
+	}
+
+	return true;
+}
+
+bool ReadMatrixFromFile(const string& fileName, Matrix3x3& matrix)
+{
+	ifstream input;
+	input.open(filename);
+
+	if (!input.is_open())
+	{
+		cout << "Failed to open '" << filename << "' for reading\n";
+		return false;
+	}
+
+	smatch searchResult;
+	regex rgx("-{0,1}\\d+");
+
+	string matrixLine;
+	unsigned matrixLineNum = 0;
+	long element;
+	
+	while (getline(input, matrixLine))
+	{
+		for (unsigned i = 0; i < 3; i++)
 		{
-			output << endl;
+			if (!regex_search(matrixLine, searchResult, rgx))
+			{
+				return false;
+			}
+			
+			if (!StrToLong(searchResult.str(), element))
+			{
+				return false;
+			}
+
+			matrix[matrixLineNum][i] = static_cast<float>(element);
+			matrixLine = searchResult.suffix().str();
+		}
+
+		++matrixLineNum;
+		
+		if (matrixLineNum > 2)
+		{
+			break;
 		}
 	}
+
+	if (matrixLineNum != 3)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+float MatrixDeterminant(const Matrix3x3& matrix)
+{
+	float determinant = 0;
+
+	determinant = matrix[0][0] * matrix[1][1] * matrix[2][2];
+	determinant += matrix[2][0] * matrix[0][1] * matrix[1][2];
+	determinant += matrix[1][0] * matrix[2][1] * matrix[0][2];
+	determinant -= matrix[2][0] * matrix[1][1] * matrix[0][2];
+	determinant -= matrix[0][0] * matrix[2][1] * matrix[1][2];
+	determinant -= matrix[1][0] * matrix[0][1] * matrix[2][2];
+
+	return determinant;
+}
+
+float MinorOfElement(const Matrix3x3& matrix, unsigned elemLineNumber, unsigned elemColumnNumber)
+{
+	Matrix2x2 matrix2x2;
+	unsigned line2x2 = 0;
+	unsigned column2x2;
+
+	for (unsigned line = 0; line < 3; ++line)
+	{
+		if (line == elemLineNumber)
+		{
+			continue;
+		}
+
+		column2x2 = 0;
+
+		for (unsigned column = 0; column < 3; ++column)
+		{
+			if (column == elemColumnNumber)
+			{
+				continue;
+			}
+
+			matrix2x2[line2x2][column2x2] = matrix[line][column];
+			++column2x2;
+		}
+
+		++line2x2;
+	}
+
+	return matrix2x2[0][0] * matrix2x2[1][1] - matrix2x2[1][0] * matrix2x2[0][1];
+}
+
+void MinorOfMatrix(const Matrix3x3& matrix, Matrix3x3& minorMatrix)
+{
+	for (unsigned line = 0; line < 3; ++line)
+	{
+		for (unsigned column = 0; column < 3; ++column)
+		{
+			minorMatrix[line][column] = MinorOfElement(matrix, line, column);
+		}
+	}
+}
+
+void CloneMatrix(const Matrix3x3& matrix, Matrix3x3& matrixClone)
+{
+	for (unsigned line = 0; line < 3; ++line)
+	{
+		for (unsigned column = 0; column < 3; ++column)
+		{
+			matrixClone[line][column] = matrix[line][column];
+		}
+	}
+}
+
+void AdjugateOfMatrix(const Matrix3x3& matrix, Matrix3x3& addMatrix)
+{
+	CloneMatrix(matrix, addMatrix);
+
+	addMatrix[0][1] = -addMatrix[0][1];
+	addMatrix[1][0] = -addMatrix[1][0];
+	addMatrix[1][2] = -addMatrix[1][2];
+	addMatrix[2][1] = -addMatrix[2][1];
+}
+
+void TransposeMatrix(const Matrix3x3& matrix, Matrix3x3& transposedMatrix)
+{
+	for (unsigned line = 0; line < 3; ++line)
+	{
+		for (unsigned column = 0; column < 3; ++column)
+		{
+			transposedMatrix[column][line] = matrix[line][column];
+		}
+	}
+}
+
+bool Invert(const Matrix3x3& matrix, Matrix3x3& invertMatrix)
+{
+	float determinant = MatrixDeterminant(matrix);
+
+	if (!determinant)
+	{
+		return false;
+	}
+
+	Matrix3x3 minor;
+	MinorOfMatrix(matrix, minor);
+
+	Matrix3x3 additionsMinor;
+	AdjugateOfMatrix(minor, additionsMinor);
+
+	Matrix3x3 transpAddMinor;
+	TransposeMatrix(additionsMinor, transpAddMinor);
+
+	for (unsigned line = 0; line < 3; ++line)
+	{
+		for (unsigned column = 0; column < 3; ++column)
+		{
+			invertMatrix[line][column] = transpAddMinor[line][column] / determinant;
+		}
+	}
+
+	return true;
 }

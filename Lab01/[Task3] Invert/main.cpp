@@ -8,8 +8,8 @@
 
 using namespace std;
 
-typedef float Matrix2x2[2][2];
-typedef float Matrix3x3[3][3];
+typedef double Matrix2x2[2][2];
+typedef double Matrix3x3[3][3];
 
 struct Args
 {
@@ -17,8 +17,8 @@ struct Args
 };
 
 optional<Args> ParseArgs(int argc, char* argv[]);
-bool ReadMatrixFromFile(string fileName, Matrix3x3& matrix);
-bool Invert(Matrix3x3& matrix, Matrix3x3& invertMatrix);
+bool ReadMatrixFromFile(const string& fileName, Matrix3x3& matrix);
+bool Invert(const Matrix3x3& matrix, Matrix3x3& invertMatrix);
 void PrintMatrix(const Matrix3x3& matrix);
 
 int main(int argc, char* argv[])
@@ -27,8 +27,6 @@ int main(int argc, char* argv[])
 
 	if (!args)
 	{
-		cout << endl << "Invalid arguments count" << endl;
-		cout << "Usage: invert.exe <matrix file>" << endl;
 		return 1;
 	}
 
@@ -80,9 +78,9 @@ void PrintMatrix(const Matrix3x3& matrix)
 	}
 }
 
-bool __stdcall StrToLong(const string& str, long& number)
+bool __fastcall StrToDouble(const string& str, double& number)
 {
-	number = strtol(str.c_str(), NULL, 10);
+	number = strtod(str.c_str(), NULL);
 
 	//проверка на переполнение после перевода строки в число
 	if (errno == ERANGE)
@@ -93,23 +91,23 @@ bool __stdcall StrToLong(const string& str, long& number)
 	return true;
 }
 
-bool ReadMatrixFromFile(string filename, Matrix3x3& matrix)
+bool ReadMatrixFromFile(const string& fileName, Matrix3x3& matrix)
 {
 	ifstream input;
-	input.open(filename);
+	input.open(fileName);
 
 	if (!input.is_open())
 	{
-		cout << "Failed to open '" << filename << "' for reading\n";
+		cout << "Failed to open '" << fileName << "' for reading\n";
 		return false;
 	}
 
 	smatch searchResult;
-	regex rgx("-{0,1}\\d+");
+	regex rgx("[+-]?([0-9]*[.])?[0-9]+");
 
 	string matrixLine;
 	unsigned matrixLineNum = 0;
-	long element;
+	double element;
 	
 	while (getline(input, matrixLine))
 	{
@@ -120,16 +118,21 @@ bool ReadMatrixFromFile(string filename, Matrix3x3& matrix)
 				return false;
 			}
 			
-			if (!StrToLong(searchResult.str(), element))
+			if (!StrToDouble(searchResult.str(), element))
 			{
 				return false;
 			}
 
-			matrix[matrixLineNum][i] = static_cast<float>(element);
+			matrix[matrixLineNum][i] = element;
 			matrixLine = searchResult.suffix().str();
 		}
 
 		++matrixLineNum;
+		
+		if (matrixLineNum > 2)
+		{
+			break;
+		}
 	}
 
 	if (matrixLineNum != 3)
@@ -140,9 +143,9 @@ bool ReadMatrixFromFile(string filename, Matrix3x3& matrix)
 	return true;
 }
 
-float MatrixDeterminant(const Matrix3x3& matrix)
+double MatrixDeterminant(const Matrix3x3& matrix)
 {
-	float determinant = 0;
+	double determinant = 0;
 
 	determinant = matrix[0][0] * matrix[1][1] * matrix[2][2];
 	determinant += matrix[2][0] * matrix[0][1] * matrix[1][2];
@@ -154,7 +157,7 @@ float MatrixDeterminant(const Matrix3x3& matrix)
 	return determinant;
 }
 
-float MinorOfElement(const Matrix3x3& matrix, unsigned elemLineNumber, unsigned elemColumnNumber)
+double MinorOfElement(const Matrix3x3& matrix, unsigned elemLineNumber, unsigned elemColumnNumber)
 {
 	Matrix2x2 matrix2x2;
 	unsigned line2x2 = 0;
@@ -208,7 +211,7 @@ void CloneMatrix(const Matrix3x3& matrix, Matrix3x3& matrixClone)
 	}
 }
 
-void MatrixOfAlgebraicAdditions(const Matrix3x3& matrix, Matrix3x3& addMatrix)
+void AdjugateOfMatrix(const Matrix3x3& matrix, Matrix3x3& addMatrix)
 {
 	CloneMatrix(matrix, addMatrix);
 
@@ -229,9 +232,9 @@ void TransposeMatrix(const Matrix3x3& matrix, Matrix3x3& transposedMatrix)
 	}
 }
 
-bool Invert(Matrix3x3& matrix, Matrix3x3& invertMatrix)
+bool Invert(const Matrix3x3& matrix, Matrix3x3& invertMatrix)
 {
-	float determinant = MatrixDeterminant(matrix);
+	double determinant = MatrixDeterminant(matrix);
 
 	if (!determinant)
 	{
@@ -242,7 +245,7 @@ bool Invert(Matrix3x3& matrix, Matrix3x3& invertMatrix)
 	MinorOfMatrix(matrix, minor);
 
 	Matrix3x3 additionsMinor;
-	MatrixOfAlgebraicAdditions(minor, additionsMinor);
+	AdjugateOfMatrix(minor, additionsMinor);
 
 	Matrix3x3 transpAddMinor;
 	TransposeMatrix(additionsMinor, transpAddMinor);
