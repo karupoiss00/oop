@@ -9,7 +9,7 @@ using namespace std;
 bool ParseFloatsToVector(istream& input, vector<float>& v)
 {
 	string inputStr;
-	float value;
+	float value = 0.f;
 
 	while (input >> inputStr)
 	{

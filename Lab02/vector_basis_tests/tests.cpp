@@ -51,4 +51,3 @@ TEST_CASE("AddThreeMinElements: Vector with zeros")
 	REQUIRE(AddThreeMinElements(v) == true);
 	CHECK_THAT(v, Catch::Approx(vExpected).epsilon(1.e-3f));
 }
-
