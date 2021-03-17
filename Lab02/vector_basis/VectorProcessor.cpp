@@ -26,18 +26,18 @@ bool ParseFloatsToVector(istream& input, vector<float>& v)
 
 	}
 
-	return true;
+	return v.size() > 0 ? true : false;
 }
 
 bool AddThreeMinElements(vector<float>& v)
 {
-	vector<float> vCopy = v;
-	std::sort(vCopy.begin(), vCopy.end());
-
 	if (v.size() < 3)
 	{
 		return false;
 	}
+
+	vector<float> vCopy = v;
+	std::sort(vCopy.begin(), vCopy.end());
 
 	const float sumOfMinElements = vCopy[0] + vCopy[1] + vCopy[2];
 
