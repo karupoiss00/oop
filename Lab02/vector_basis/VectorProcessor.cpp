@@ -6,24 +6,26 @@
 
 using namespace std;
 
+void PrintVectorOfFloats(const vector<float>& v)
+{
+	for (float elem : v)
+	{
+		cout << elem << " ";
+	}
+}
+
 bool ParseFloatsToVector(istream& input, vector<float>& v)
 {
-	string inputStr;
 	float value = 0.f;
 
-	while (input >> inputStr)
+	while (input >> value && !input.eof())
 	{
-		std::istringstream strm(inputStr);
-		float value;
-		if (strm >> value)
-		{
-			v.push_back(value);
-		}
-		else
-		{
-			return false;
-		}
-
+		v.push_back(value);
+	}
+	
+	if (!input.eof())
+	{
+		return false;
 	}
 
 	return v.size() > 0 ? true : false;
@@ -48,10 +50,3 @@ bool AddThreeMinElements(vector<float>& v)
 	return true;
 }
 
-void PrintVectorOfFloats(const vector<float>& v)
-{
-	for (float elem : v)
-	{
-		cout << elem << " ";
-	}
-}

@@ -18,8 +18,15 @@ TEST_CASE("ParseFloatsToVector: Incorrect input without number")
 TEST_CASE("ParseFloatsToVector: Part of input contains numbers, but contain non-digit chars")
 {
 	std::vector<float> v;
-	std::istringstream input("1,001 2 3 oops 4");
+	std::istringstream input("1.001 2 3 oops 4");
 	REQUIRE(ParseFloatsToVector(input, v) == false);
+}
+
+TEST_CASE("ParseFloatsToVector: Correct input")
+{
+	std::vector<float> v;
+	std::istringstream input("1.001 2 3 4");
+	REQUIRE(ParseFloatsToVector(input, v) == true);
 }
 
 TEST_CASE("AddThreeMinElements: Vector with count of numbers less than 3")
