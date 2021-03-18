@@ -39,7 +39,7 @@ bool AddThreeMinElements(vector<float>& v)
 	}
 
 	vector<float> vCopy = v;
-	std::sort(vCopy.begin(), vCopy.end());
+	std::partial_sort(vCopy.begin(), vCopy.begin() + 3, vCopy.end());
 
 	const float sumOfMinElements = vCopy[0] + vCopy[1] + vCopy[2];
 
