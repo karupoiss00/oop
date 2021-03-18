@@ -10,7 +10,7 @@ void PrintVectorOfFloats(const vector<float>& v)
 {
 	std::for_each(v.cbegin(), v.cend(), [](const float& elem)
 	{
-		cout << elem, " ";
+		cout << elem << " ";
 	});
 }
 
@@ -49,4 +49,3 @@ bool AddThreeMinElements(vector<float>& v)
 	});
 	return true;
 }
-
