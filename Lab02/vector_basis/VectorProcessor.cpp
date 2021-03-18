@@ -8,10 +8,10 @@ using namespace std;
 
 void PrintVectorOfFloats(const vector<float>& v)
 {
-	for (float elem : v)
+	std::for_each(v.cbegin(), v.cend(), [](const float& elem)
 	{
-		cout << elem << " ";
-	}
+		cout << elem, " ";
+	});
 }
 
 bool ParseFloatsToVector(istream& input, vector<float>& v)
@@ -43,10 +43,10 @@ bool AddThreeMinElements(vector<float>& v)
 
 	const float sumOfMinElements = vCopy[0] + vCopy[1] + vCopy[2];
 
-	for (float& elem : v)
+	std::for_each(v.begin(), v.end(), [sumOfMinElements](float& elem)
 	{
 		elem += sumOfMinElements;
-	}
+	});
 	return true;
 }
 
