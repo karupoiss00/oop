@@ -6,7 +6,7 @@ TEST_CASE("ParseFloatsToVector: Empty string in input")
 	std::vector<float> v;
 	std::istringstream input("");
 	REQUIRE(ParseFloatsToVector(input, v) == false);
-}
+}	
 
 TEST_CASE("ParseFloatsToVector: Incorrect input without number")
 {
