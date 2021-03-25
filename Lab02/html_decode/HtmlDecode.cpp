@@ -1,5 +1,12 @@
 #include <cassert>
+#include <iostream>
 #include "HtmlDecode.h"
+
+struct DecodedEntity
+{
+    char ch;
+    size_t length;
+};
 
 namespace
 {
@@ -14,13 +21,6 @@ namespace
         {"&quot;"sv, '"'},
     };
 }
-
-
-struct DecodedEntity
-{
-    char ch;
-    size_t length;
-};
 
 DecodedEntity DecodeEntity(std::string_view text)
 {
