@@ -1,4 +1,26 @@
+#include <cassert>
 #include "HtmlDecode.h"
+
+namespace
+{
+    using namespace std::literals;
+
+    constexpr std::pair<std::string_view, char> entities[] =
+    {
+        {"&amp;"sv, '&'},
+        {"&lt;"sv, '<'},
+        {"&gt;"sv, '>'},
+        {"&apos;"sv, '\''},
+        {"&quot;"sv, '"'},
+    };
+}
+
+
+struct DecodedEntity
+{
+    char ch;
+    size_t length;
+};
 
 DecodedEntity DecodeEntity(std::string_view text)
 {
