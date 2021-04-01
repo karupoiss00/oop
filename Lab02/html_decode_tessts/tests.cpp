@@ -6,19 +6,17 @@
 
 using namespace std;
 
+#ifdef NDEBUG
 TEST_CASE("GeneratePrimeNumbersSet: check timings and count of primes")
 {
-#ifdef NDEBUG
     auto t1 = std::chrono::high_resolution_clock::now();
-#endif
     set<size_t> primes = GeneratePrimeNumbersSet(100000000);
-#ifdef NDEBUG 
     auto t2 = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count();
     REQUIRE(duration < 12);
-#endif
     REQUIRE(primes.size() == 5761455);
 }
+#endif
 
 TEST_CASE("GeneratePrimeNumbersSet: check 0 value")
 {
