@@ -97,7 +97,7 @@ unsigned TranslateLexeme(const string& lexeme, Dictionary& dct, pOutputStream pr
 
 	pair<Dictionary::iterator, Dictionary::iterator> entrys;
 	entrys = dct.equal_range(lexeme);
-	size_t entrysCount = 0;
+	unsigned entrysCount = 0;
 
 	for (Dictionary::iterator it = entrys.first; it != entrys.second; ++it)
 	{
