@@ -22,7 +22,7 @@ bool LoadDictionary(const string& fileName, Dictionary& dct)
 	return true;
 }
 
-bool NeedDictionarySaving(pInput inp, pOutput out)
+bool NeedDictionarySaving(pInputStream inp, pOutputStream out)
 {
 	string confirm;
 
@@ -50,7 +50,7 @@ bool SaveDictionary(const string& fileName, Dictionary& dct)
 	return true;
 }
 
-void StartSessionWithUser(Dictionary& dct, pInput read, pOutput print)
+void StartSessionWithUser(Dictionary& dct, pInputStream read, pOutputStream print)
 {
 	string lexeme;
 
@@ -68,7 +68,7 @@ void StartSessionWithUser(Dictionary& dct, pInput read, pOutput print)
 	}
 }
 
-void Translate(string& lexeme, Dictionary& dct, pInput read, pOutput print)
+void Translate(string& lexeme, Dictionary& dct, pInputStream read, pOutputStream print)
 {
 	transform(lexeme.begin(), lexeme.end(), lexeme.begin(), ::tolower);
 
@@ -88,7 +88,7 @@ void Translate(string& lexeme, Dictionary& dct, pInput read, pOutput print)
 	}
 }
 
-unsigned TranslateLexeme(const string& lexeme, Dictionary& dct, pOutput print)
+unsigned TranslateLexeme(const string& lexeme, Dictionary& dct, pOutputStream print)
 {
 	if (!dct.count(lexeme))
 	{
@@ -112,7 +112,7 @@ unsigned TranslateLexeme(const string& lexeme, Dictionary& dct, pOutput print)
 	return entrysCount;
 }
 
-unsigned TranslateLexemeReverse(const string& lexeme, Dictionary& dct, pOutput out)
+unsigned TranslateLexemeReverse(const string& lexeme, Dictionary& dct, pOutputStream out)
 {
 	unsigned entrysCount = 0;
 
@@ -132,7 +132,7 @@ unsigned TranslateLexemeReverse(const string& lexeme, Dictionary& dct, pOutput o
 	return entrysCount;
 }
 
-void InputTranslation(string& lexeme, Dictionary& dct, bool isEnglish, pInput read, pOutput print)
+void InputTranslation(string& lexeme, Dictionary& dct, bool isEnglish, pInputStream read, pOutputStream print)
 {
 	string translation;
 

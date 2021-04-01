@@ -9,9 +9,9 @@
 #include <string>
 #include <boost/format.hpp>
 
-typedef std::multimap<std::string, std::string> Dictionary;
-typedef void (*pInput)(std::string&);
-typedef void (*pOutput)(const std::string&);
+using Dictionary = std::multimap<std::string, std::string>;
+using pInputStream = void(*)(std::string&);
+using pOutputStream = void(*)(const std::string&);
 
 enum Languages
 {
@@ -25,13 +25,13 @@ void Output(const std::string& str);
 bool LoadDictionary(const std::string& fileName, Dictionary& dct);
 bool SaveDictionary(const std::string& fileName, Dictionary& dct);
 
-void StartSessionWithUser(Dictionary& dct, pInput read, pOutput print);
-void Translate(std::string& lexeme, Dictionary& dct, pInput read, pOutput print);
+void StartSessionWithUser(Dictionary& dct, pInputStream read, pOutputStream print);
+void Translate(std::string& lexeme, Dictionary& dct, pInputStream read, pOutputStream print);
 
-unsigned TranslateLexeme(const std::string& lexeme, Dictionary& dct, pOutput print);
-unsigned TranslateLexemeReverse(const std::string& lexeme, Dictionary& dct, pOutput print);
+unsigned TranslateLexeme(const std::string& lexeme, Dictionary& dct, pOutputStream print);
+unsigned TranslateLexemeReverse(const std::string& lexeme, Dictionary& dct, pOutputStream print);
 
-void InputTranslation(std::string& lexeme, Dictionary& dct, bool isEnglish, pInput read, pOutput print);
+void InputTranslation(std::string& lexeme, Dictionary& dct, bool isEnglish, pInputStream read, pOutputStream print);
 bool IsLexemeRussian(const std::string& lexeme);
 
-bool NeedDictionarySaving(pInput inp, pOutput out);
+bool NeedDictionarySaving(pInputStream inp, pOutputStream out);
