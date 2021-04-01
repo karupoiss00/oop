@@ -6,7 +6,7 @@ using namespace std;
 
 struct Args
 {
-	size_t upperBound;
+	int upperBound;
 };
 
 optional<Args> ParseArgs(int argc, char* argv[]);
@@ -20,15 +20,13 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	
-
 	if (args->upperBound < 2)
 	{
 		cout << "Ivalid argument!" << endl;
 		return 1;
 	}
 
-	set<size_t>	primes = GeneratePrimeNumbersSet(args->upperBound);
+	set<size_t>	primes = GeneratePrimeNumbersSet(static_cast<size_t>(args->upperBound));
 
 	for (auto primeNumber : primes)
 	{
