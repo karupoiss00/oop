@@ -6,7 +6,7 @@ using namespace std;
 
 struct Args
 {
-	string upperBound;
+	size_t upperBound;
 };
 
 optional<Args> ParseArgs(int argc, char* argv[]);
@@ -20,15 +20,20 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	size_t upperBound = atoi(args->upperBound.c_str());
+	
 
-	if (upperBound < 2)
+	if (args->upperBound < 2)
 	{
 		cout << "Ivalid argument!" << endl;
 		return 1;
 	}
 
-	set<size_t> primes = GeneratePrimeNumbersSet(upperBound);
+	set<size_t>	primes = GeneratePrimeNumbersSet(args->upperBound);
+
+	for (auto primeNumber : primes)
+	{
+		cout << primeNumber << " ";
+	}
 
 	return 0;
 }
@@ -43,7 +48,7 @@ optional<Args> ParseArgs(int argc, char* argv[])
 	}
 
 	Args args;
-	args.upperBound = argv[1];
+	args.upperBound = atoi(argv[1]);
 
 	return args;
 }

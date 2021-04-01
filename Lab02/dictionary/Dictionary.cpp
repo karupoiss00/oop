@@ -70,13 +70,14 @@ void StartSessionWithUser(Dictionary& dct, pInputFn read, pOutputFn print)
 
 void Translate(string& lexeme, Dictionary& dct, pInputFn read, pOutputFn print)
 {
-	transform(lexeme.begin(), lexeme.end(), lexeme.begin(), ::tolower);
+	string lowerCaseLexeme = lexeme;
+	transform(lowerCaseLexeme.begin(), lowerCaseLexeme.end(), lowerCaseLexeme.begin(), ::tolower);
 
-	if (!IsLexemeRussian(lexeme))
+	if (!IsLexemeRussian(lowerCaseLexeme))
 	{
-		if (!TranslateLexeme(lexeme, dct, print))
+		if (!TranslateLexeme(lowerCaseLexeme, dct, print))
 		{
-			InputTranslation(lexeme, dct, ENGLISH, read, print);
+			InputTranslation(lowerCaseLexeme, dct, ENGLISH, read, print);
 		}
 	}
 	else
@@ -156,7 +157,7 @@ void InputTranslation(string& lexeme, Dictionary& dct, bool isEnglish, pInputFn 
 
 bool IsLexemeRussian(const string& lexeme)
 {
-	auto IsRussianChar = [](char ch) { return (ch >= 'а') && (ch <= 'я'); };
+	auto IsRussianChar = [](char ch) { return ((ch >= 'а') && (ch <= 'я') || (ch == 'ё')); };
 	return any_of(lexeme.begin(), lexeme.end(), IsRussianChar);
 }
 
