@@ -28,7 +28,6 @@ TEST_CASE("GeneratePrimeNumbersSet: check 2 value (bound)")
 {
     set<size_t> primes = GeneratePrimeNumbersSet(2);
     set<size_t> expectedPrimes{ 2 };
-    REQUIRE(primes.size() == 1);
     REQUIRE(primes == expectedPrimes);
 }
 
@@ -36,6 +35,5 @@ TEST_CASE("GeneratePrimeNumbersSet: check 7 value (prime number bound)")
 {
     set<size_t> primes = GeneratePrimeNumbersSet(7);
     set<size_t> expectedPrimes{ 2, 3, 5, 7 };
-    REQUIRE(primes.size() == 4);
     REQUIRE(primes == expectedPrimes);
 }
