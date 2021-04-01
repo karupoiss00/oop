@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	set<size_t>&& primes = GeneratePrimeNumbersSet(upperBound);
+	set<size_t> primes = GeneratePrimeNumbersSet(upperBound);
 
 	return 0;
 }
