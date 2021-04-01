@@ -8,7 +8,9 @@ using namespace std;
 
 TEST_CASE("GeneratePrimeNumbersSet: check timings and count of primes")
 {
+#ifdef NDEBUG
     auto t1 = std::chrono::high_resolution_clock::now();
+#endif
     set<size_t> primes = GeneratePrimeNumbersSet(100000000);
 #ifdef NDEBUG 
     auto t2 = std::chrono::high_resolution_clock::now();
