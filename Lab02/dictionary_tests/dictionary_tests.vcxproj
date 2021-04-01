@@ -147,15 +147,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\dictionary\Dictionary.cpp" />
-    <ClCompile Include="..\html_decode_tessts\main.cpp" />
-    <ClCompile Include="..\html_decode_tessts\tests.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="test.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\dictionary\DialogConsts.h" />
     <ClInclude Include="..\dictionary\Dictionary.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
