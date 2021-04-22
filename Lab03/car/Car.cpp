@@ -3,7 +3,7 @@
 using namespace std;
 
 CCar::CCar()
-	: m_isEngineOn(false), m_speed(0), m_gear(Gears::Neutral)
+	: m_isEngineOn(false), m_speed(0), m_gear(Gear::Neutral)
 {
 
 }
@@ -28,19 +28,27 @@ int CCar::GetSpeed() const
 	return abs(m_speed);
 }
 
-int CCar::GetGear() const
+Gear CCar::GetGear() const
 {
 	return m_gear;
 }
 
 bool CCar::TurnOnEngine()
 {
-	return m_isEngineOn ? false : (m_isEngineOn = true);
+	if (m_isEngineOn)
+	{
+		return false;
+	}
+	else
+	{
+		m_isEngineOn = true;
+		return true;
+	}
 }
 
 bool CCar::TurnOffEngine()
 {
-	if (m_isEngineOn && (GetDirection() == Direction::Stop) && (m_gear == Gears::Neutral))
+	if (m_isEngineOn && (GetDirection() == Direction::Stop) && (m_gear == Gear::Neutral))
 	{
 		m_isEngineOn = false;
 		return true;
@@ -49,14 +57,14 @@ bool CCar::TurnOffEngine()
 	return false;
 }
 
-bool CCar::SetGear(int gear)
+bool CCar::SetGear(Gear gear)
 {
-	if ((gear < Gears::Reverse) || (gear > Gears::Fifth))
+	if ((gear < Gear::Reverse) || (gear > Gear::Fifth))
 	{
 		return false;
 	}
 
-	if ((!m_isEngineOn && gear != Gears::Neutral) || gear == m_gear)
+	if ((!m_isEngineOn && gear != Gear::Neutral) || gear == m_gear)
 	{
 		return false;
 	}
@@ -66,7 +74,7 @@ bool CCar::SetGear(int gear)
 		return SetGearWhenDirectionIsBack(gear);
 	}
 
-	if (gear == Gears::Reverse)
+	if (gear == Gear::Reverse)
 	{
 		return SetReverseGear();
 	}
@@ -87,7 +95,7 @@ bool CCar::SetSpeed(int speed)
 		return false;
 	}
 
-	if (speed > GetSpeed() && m_gear == Gears::Neutral)
+	if (speed > GetSpeed() && m_gear == Gear::Neutral)
 	{
 		return false;
 	}
@@ -97,7 +105,7 @@ bool CCar::SetSpeed(int speed)
 		return false;
 	}
 
-	if (GetDirection() == Direction::Backward || GetGear() == Gears::Reverse)
+	if (GetDirection() == Direction::Backward || GetGear() == Gear::Reverse)
 	{
 		m_speed = -speed;
 	}
@@ -109,16 +117,16 @@ bool CCar::SetSpeed(int speed)
 	return true;
 }
 
-bool CCar::SetGearWhenDirectionIsBack(int gear)
+bool CCar::SetGearWhenDirectionIsBack(Gear gear)
 {
 	if (!m_isEngineOn || (gear == m_gear) || (GetDirection() != Direction::Backward))
 	{
 		return false;
 	}
 
-	if (gear == Gears::Neutral)
+	if (gear == Gear::Neutral)
 	{
-		m_gear = Gears::Neutral;
+		m_gear = Gear::Neutral;
 		return true;
 	}
 
@@ -127,21 +135,21 @@ bool CCar::SetGearWhenDirectionIsBack(int gear)
 
 bool CCar::SetReverseGear()
 {
-	if ((GetDirection() == Direction::Stop) && (m_gear == Gears::Neutral || m_gear == Gears::First))
+	if ((GetDirection() == Direction::Stop) && (m_gear == Gear::Neutral || m_gear == Gear::First))
 	{
-		m_gear = Gears::Reverse;
+		m_gear = Gear::Reverse;
 		return true;
 	}
 
 	return false;
 }
 
-bool CCar::SpeedInGearRange(int speed, int gear) const
+bool CCar::SpeedInGearRange(int speed, Gear gear) const
 {
 	const int speedRanges[][2] = { {0, 20}, {0, 150}, {0, 30}, {20, 50}, {30, 60}, {40, 90}, {50, 150} };
 
-	int minSpeed = speedRanges[gear + 1][0];
-	int maxSpeed = speedRanges[gear + 1][1];
+	int minSpeed = speedRanges[static_cast<int>(gear) + 1][0];
+	int maxSpeed = speedRanges[static_cast<int>(gear) + 1][1];
 
 	return (speed >= minSpeed) && (speed <= maxSpeed);
 }

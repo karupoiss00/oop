@@ -14,12 +14,11 @@ class CCarController
 {
 public:
 	CCarController(CCar& car, std::istream& input, std::ostream& output);
-	CCarController(const CCarController&) = delete;
-	CCarController& operator=(const CCarController&) = delete;
 	
 	bool HandleCommand();
 
 private:
+	//must be const methods
 	bool Info(std::istream& args);
 	bool EngineOn(std::istream& args);
 	bool EngineOff(std::istream& args);

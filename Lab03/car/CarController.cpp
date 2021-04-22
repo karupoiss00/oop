@@ -7,9 +7,9 @@ using namespace std::placeholders;
 CCarController::CCarController(CCar& car, std::istream& input, std::ostream& output)
 	: m_car(car), m_input(input), m_output(output)
 {
-	m_actionMap.insert(make_pair("Info", bind(&CCarController::Info, this, _1)));
-	m_actionMap.insert(make_pair("EngineOn", bind(&CCarController::EngineOn, this, _1)));
-	m_actionMap.insert(make_pair("EngineOff", bind(&CCarController::EngineOff, this, _1)));
+	m_actionMap.emplace("Info", bind(&CCarController::Info, this, _1));
+	m_actionMap.emplace("EngineOn", bind(&CCarController::EngineOn, this, _1));
+	m_actionMap.emplace("EngineOff", bind(&CCarController::EngineOff, this, _1));
 	m_actionMap.insert(make_pair("SetGear", bind(&CCarController::SetGear, this, _1)));
 	m_actionMap.insert(make_pair("SetSpeed", bind(&CCarController::SetSpeed, this, _1)));
 }
@@ -98,7 +98,7 @@ bool CCarController::SetGear(std::istream& args)
 
 	if (StrArgToNumber(arg, gear))
 	{
-		if (m_car.SetGear(gear))
+		if (m_car.SetGear(static_cast<Gear>(gear)))
 		{
 			info = "Gear has been successfully set";
 			info += "\nCurrent gear: " + to_string(static_cast<long long>(gear));

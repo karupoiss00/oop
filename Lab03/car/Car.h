@@ -1,14 +1,14 @@
 #pragma once
 #include <iostream>
 
-enum Direction : int
+enum class Direction : int
 {
 	Stop = 0,
 	Forward,
 	Backward
 };
 
-enum Gears : int
+enum class Gear : int
 {
 	Reverse = -1,
 	Neutral,
@@ -27,19 +27,19 @@ public:
 	bool IsEngineOn() const;
 	Direction GetDirection() const;
 	int GetSpeed() const;
-	int GetGear() const;
+	Gear GetGear() const;
 
 	bool TurnOnEngine();
 	bool TurnOffEngine();
-	bool SetGear(int gear);
+	bool SetGear(Gear gear);
 	bool SetSpeed(int speed);
 
 private:
 	bool m_isEngineOn;
 	int m_speed;
-	int m_gear;
+	Gear m_gear;
 
-	bool SetReverseGear();
-	bool SetGearWhenDirectionIsBack(int gear);
-	bool SpeedInGearRange(int speed, int gear) const;
+	[[nodiscard]] bool SetReverseGear();
+	[[nodiscard]] bool SetGearWhenDirectionIsBack(Gear gear);
+	[[nodiscard]] bool SpeedInGearRange(int speed, Gear gear) const;
 };
