@@ -18,7 +18,6 @@ public:
 	bool HandleCommand();
 
 private:
-	//must be const methods
 	bool Info(std::istream& args);
 	bool EngineOn(std::istream& args);
 	bool EngineOff(std::istream& args);
