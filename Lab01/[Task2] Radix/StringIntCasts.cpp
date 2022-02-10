@@ -2,7 +2,7 @@
 
 using namespace std;
 
-unsigned PreporationToConverting(string& str, unsigned radix, unsigned& radixInMaxPow, bool& isNegative)
+unsigned PreparationToConverting(string& str, unsigned radix, unsigned& radixInMaxPow, bool& isNegative)
 {
 	isNegative = false;
 
@@ -72,7 +72,7 @@ int StringToInt(string str, unsigned radix, bool& wasError)
 	unsigned radixInMaxPow;
 	bool isNegative;
 
-	if (result = PreporationToConverting(str, radix, radixInMaxPow, isNegative))
+	if (result = PreparationToConverting(str, radix, radixInMaxPow, isNegative))
 	{
 		wasError = true;
 		return result;
