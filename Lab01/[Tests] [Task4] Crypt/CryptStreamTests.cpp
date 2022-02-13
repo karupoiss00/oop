@@ -20,7 +20,8 @@ TEST_CASE("CryptStream: Empty string in input")
 	std::ostringstream outputDecrypted;
 	DecryptStream(inputCrypted, outputDecrypted, key);
 
-	REQUIRE(AreEqualString(outputDecrypted.str(), ""));
+	const std::string decryptedMessage = outputDecrypted.str();
+	REQUIRE(AreEqualString(decryptedMessage, ""));
 }
 
 TEST_CASE("CryptStream: One line string in input with only letters")
@@ -36,7 +37,9 @@ TEST_CASE("CryptStream: One line string in input with only letters")
 	std::ostringstream outputDecrypted;
 	DecryptStream(inputCrypted, outputDecrypted, key);
 
-	REQUIRE(AreEqualString(outputDecrypted.str(), srcMessage));
+	const std::string decryptedMessage = outputDecrypted.str();
+
+	REQUIRE(AreEqualString(decryptedMessage, srcMessage));
 }
 
 TEST_CASE("CryptStream: One line string in input with only digits")
@@ -52,7 +55,9 @@ TEST_CASE("CryptStream: One line string in input with only digits")
 	std::ostringstream outputDecrypted;
 	DecryptStream(inputCrypted, outputDecrypted, key);
 
-	REQUIRE(AreEqualString(outputDecrypted.str(), srcMessage));
+	const std::string decryptedMessage = outputDecrypted.str();
+
+	REQUIRE(AreEqualString(decryptedMessage, srcMessage));
 }
 
 TEST_CASE("CryptStream: One line string in input with letters and digits")
@@ -67,6 +72,8 @@ TEST_CASE("CryptStream: One line string in input with letters and digits")
 	std::istringstream inputCrypted(outputCrypted.str());
 	std::ostringstream outputDecrypted;
 	DecryptStream(inputCrypted, outputDecrypted, key);
-	INFO("|" + outputDecrypted.str() + "|\n" + "|" + srcMessage + "|")
-	REQUIRE(AreEqualString(outputDecrypted.str(), srcMessage));
+
+	const std::string decryptedMessage = outputDecrypted.str();
+	INFO("|" + outputDecrypted.str() + "|\n" + "|" + srcMessage + "|");
+	REQUIRE(AreEqualString(decryptedMessage, srcMessage));
 }
