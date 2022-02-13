@@ -41,6 +41,8 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
+	CryptingKey cryptingKey = static_cast<CryptingKey>(args->key);
+
 	ifstream input;
 	input.open(args->inputFileName, ios::binary);
 
@@ -61,11 +63,11 @@ int main(int argc, char* argv[])
 
 	if (!args->operationName.compare(CRYPT_OPERATION))
 	{
-		CryptStream(input, output, args->key);
+		CryptStream(input, output, cryptingKey);
 	}
 	else
 	{
-		DecryptStream(input, output, args->key);
+		DecryptStream(input, output, cryptingKey);
 	}
 
 	return 0;

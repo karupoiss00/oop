@@ -8,40 +8,61 @@
 
 using namespace std;
 
-char BitsetToChar(bitset<8>& bits)
+const size_t BYTE_SIZE = 8;
+
+char BitsetToChar(bitset<8> & bits)
 {
 	unsigned long i = bits.to_ulong();
 	return static_cast<char>(i);
 }
 
-char CryptByte(char srcByte, int key)
+char CryptByte(char srcByte, CryptingKey key)
 {
-	char xoredByte = srcByte ^ key;
-	bitset<8> uncryptedBitmap(xoredByte);
-	bitset<8> cryptedBitmap;
+	char xoredSrcByte = srcByte ^ key;
+	char cryptedByte = static_cast<char>(0);
 
-	for (const auto& [srcBitIndex, destBitIndex] : cryptingMap) {
-		cryptedBitmap.set(destBitIndex, uncryptedBitmap[srcBitIndex]);
+	for (const auto& [srcBitIndex, destBitIndex] : cryptingMap)
+	{
+		size_t mask = static_cast<size_t>(pow(2, srcBitIndex));
+
+		int shift = destBitIndex - srcBitIndex;
+	
+		if (shift > 0)
+		{
+			cryptedByte |= (xoredSrcByte & mask) << shift;
+		}
+		else
+		{
+			cryptedByte |= (xoredSrcByte & mask) >> -shift;
+		}	
 	}
 
-	return BitsetToChar(cryptedBitmap);
+	return cryptedByte;
 }
 
-char DecryptByte(char cryptedByte, int key)
+char DecryptByte(char cryptedByte, CryptingKey key)
 {
-	bitset<8> cryptedBitmap(cryptedByte);
-	bitset<8> decryptedBitmap;
+	char decryptedByte = static_cast<char>(0);
 
-	for (const auto& [destBitIndex, srcBitIndex] : cryptingMap) {
-		decryptedBitmap.set(destBitIndex, cryptedBitmap[srcBitIndex]);
+	for (const auto& [destBitIndex, srcBitIndex] : cryptingMap)
+	{
+		size_t mask = static_cast<size_t>(pow(2, srcBitIndex));
+
+		int shift = destBitIndex - srcBitIndex;
+
+		if (shift > 0)
+		{
+			decryptedByte |= (cryptedByte & mask) << shift;
+		}
+		else
+		{
+			decryptedByte |= (cryptedByte & mask) >> -shift;
+		}
 	}
-
-	char unxoredChar = BitsetToChar(decryptedBitmap);
-
-	return unxoredChar ^ key;
+	return decryptedByte ^ key;
 }
 
-string CryptString(const string& srcStr, int key)
+string CryptString(const string& srcStr, CryptingKey key)
 {
 	string cryptedString = "";
 	for (const auto& symbol : srcStr) {
@@ -51,7 +72,7 @@ string CryptString(const string& srcStr, int key)
 	return cryptedString;
 }
 
-string DecryptString(const string& cryptedStr, int key)
+string DecryptString(const string& cryptedStr, CryptingKey key)
 {
 	string decryptedString = "";
 	for (const auto& symbol : cryptedStr) {
@@ -61,7 +82,7 @@ string DecryptString(const string& cryptedStr, int key)
 	return decryptedString;
 }
 
-void CryptStream(istream& input, ostream& output, int key)
+void CryptStream(istream& input, ostream& output, CryptingKey key)
 {
 	string line;
 	while (getline(input, line))
@@ -69,12 +90,12 @@ void CryptStream(istream& input, ostream& output, int key)
 		output << CryptString(line, key);
 		if (!output.eof())
 		{
-			cout << endl;
+			output << endl;
 		}
 	}
 }
 
-void DecryptStream(istream& input, ostream& output, int key)
+void DecryptStream(istream& input, ostream& output, CryptingKey key)
 {
 	string line;
 	while (getline(input, line))
@@ -82,7 +103,7 @@ void DecryptStream(istream& input, ostream& output, int key)
 		output << DecryptString(line, key);
 		if (!output.eof())
 		{
-			cout << endl;
+			output << endl;
 		}
 	}
 }

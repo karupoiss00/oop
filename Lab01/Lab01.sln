@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "[Task3] Invert", "[Task3] I
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "[Task4] Crypt", "[Task4] Crypt\[Task4] Crypt.vcxproj", "{55DE68FA-E126-4213-B353-299E36CE9501}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "[Tests] [Task4] Crypt", "[Tests] [Task4] Crypt\[Tests] [Task4] Crypt.vcxproj", "{B291BDA8-71AD-4C49-9664-292E11DC49D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{55DE68FA-E126-4213-B353-299E36CE9501}.Release|x64.Build.0 = Release|x64
 		{55DE68FA-E126-4213-B353-299E36CE9501}.Release|x86.ActiveCfg = Release|Win32
 		{55DE68FA-E126-4213-B353-299E36CE9501}.Release|x86.Build.0 = Release|Win32
+		{B291BDA8-71AD-4C49-9664-292E11DC49D5}.Debug|x64.ActiveCfg = Debug|x64
+		{B291BDA8-71AD-4C49-9664-292E11DC49D5}.Debug|x64.Build.0 = Debug|x64
+		{B291BDA8-71AD-4C49-9664-292E11DC49D5}.Debug|x86.ActiveCfg = Debug|Win32
+		{B291BDA8-71AD-4C49-9664-292E11DC49D5}.Debug|x86.Build.0 = Debug|Win32
+		{B291BDA8-71AD-4C49-9664-292E11DC49D5}.Release|x64.ActiveCfg = Release|x64
+		{B291BDA8-71AD-4C49-9664-292E11DC49D5}.Release|x64.Build.0 = Release|x64
+		{B291BDA8-71AD-4C49-9664-292E11DC49D5}.Release|x86.ActiveCfg = Release|Win32
+		{B291BDA8-71AD-4C49-9664-292E11DC49D5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
