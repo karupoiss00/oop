@@ -23,12 +23,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="OperationNames.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CryptingMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CryptStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>

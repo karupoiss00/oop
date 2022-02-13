@@ -1,17 +1,15 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <bitset>
-#include "OperationNames.h"
-#include "CryptingMap.h"
+#include <map>
 #include "CryptStream.h"
 
 using namespace std;
 
-const size_t BYTE_SIZE = 8;
-
-char mapBitsInByte(char byteToMapping, char& byteFromMapping, size_t& mask, int& shift)
+char mapBitsInByte(char byteToMapping, char byteFromMapping, size_t bitIndexTo, size_t bitIndexFrom)
 {
+	size_t mask = static_cast<size_t>(pow(2, bitIndexFrom));
+	int shift = bitIndexTo - bitIndexFrom;
 	if (shift > 0)
 	{
 		byteToMapping |= (byteFromMapping & mask) << shift;
@@ -31,9 +29,7 @@ char CryptByte(char srcByte, CryptingKey key)
 
 	for (const auto& [srcBitIndex, destBitIndex] : cryptingMap)
 	{
-		size_t mask = static_cast<size_t>(pow(2, srcBitIndex));
-		int shift = destBitIndex - srcBitIndex;
-		cryptedByte = mapBitsInByte(cryptedByte, xoredSrcByte, mask, shift);
+		cryptedByte = mapBitsInByte(cryptedByte, xoredSrcByte, destBitIndex, srcBitIndex);
 	}
 
 	return cryptedByte;
@@ -45,9 +41,7 @@ char DecryptByte(char cryptedByte, CryptingKey key)
 
 	for (const auto& [destBitIndex, srcBitIndex] : cryptingMap)
 	{
-		size_t mask = static_cast<size_t>(pow(2, srcBitIndex));
-		int shift = destBitIndex - srcBitIndex;
-		decryptedByte = mapBitsInByte(decryptedByte, cryptedByte, mask, shift);
+		decryptedByte = mapBitsInByte(decryptedByte, cryptedByte, destBitIndex, srcBitIndex);
 	}
 	return decryptedByte ^ key;
 }

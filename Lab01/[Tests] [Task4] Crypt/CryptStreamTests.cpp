@@ -62,7 +62,7 @@ TEST_CASE("CryptStream: One line string in input with only digits")
 
 TEST_CASE("CryptStream: One line string in input with letters and digits")
 {
-	std::string srcMessage = "1 2 3 4 5_Coffee is going to hike\n";
+	std::string srcMessage = "1 2 3 4 5 Coffee is going to hike for Cake\n";
 	CryptingKey key = 1;
 	std::istringstream inputNotCrypted(srcMessage);
 	std::ostringstream outputCrypted;

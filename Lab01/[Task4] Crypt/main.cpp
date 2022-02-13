@@ -3,7 +3,6 @@
 #include <string>
 #include <optional>
 #include "CryptStream.h"
-#include "OperationNames.h"
 
 using namespace std;
 
