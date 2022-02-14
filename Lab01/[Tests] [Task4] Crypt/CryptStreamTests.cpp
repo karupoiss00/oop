@@ -26,7 +26,7 @@ TEST_CASE("CryptStream: Empty string in input")
 
 TEST_CASE("CryptStream: One line string in input with only letters")
 {
-	std::string srcMessage = "karupoiss\n";
+	std::string srcMessage = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz\n";
 	CryptingKey key = 1;
 	std::istringstream inputNotCrypted(srcMessage);
 	std::ostringstream outputCrypted;
@@ -38,7 +38,6 @@ TEST_CASE("CryptStream: One line string in input with only letters")
 	DecryptStream(inputCrypted, outputDecrypted, key);
 
 	const std::string decryptedMessage = outputDecrypted.str();
-
 	REQUIRE(AreEqualString(decryptedMessage, srcMessage));
 }
 
@@ -56,7 +55,6 @@ TEST_CASE("CryptStream: One line string in input with only digits")
 	DecryptStream(inputCrypted, outputDecrypted, key);
 
 	const std::string decryptedMessage = outputDecrypted.str();
-
 	REQUIRE(AreEqualString(decryptedMessage, srcMessage));
 }
 
@@ -74,6 +72,5 @@ TEST_CASE("CryptStream: One line string in input with letters and digits")
 	DecryptStream(inputCrypted, outputDecrypted, key);
 
 	const std::string decryptedMessage = outputDecrypted.str();
-	INFO("|" + outputDecrypted.str() + "|\n" + "|" + srcMessage + "|");
 	REQUIRE(AreEqualString(decryptedMessage, srcMessage));
 }

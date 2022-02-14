@@ -6,6 +6,7 @@
 
 using namespace std;
 
+
 char mapBitsInByte(char byteToMapping, char byteFromMapping, size_t bitIndexTo, size_t bitIndexFrom)
 {
 	size_t mask = static_cast<size_t>(pow(2, bitIndexFrom));
@@ -74,9 +75,9 @@ void CryptStream(istream& input, ostream& output, CryptingKey key)
 	while (getline(input, line))
 	{
 		output << CryptString(line, key);
-		if (!output.eof())
+		if (!input.eof())
 		{
-			output << endl;
+			output << CryptByte('\n', key);
 		}
 	}
 }
@@ -87,9 +88,9 @@ void DecryptStream(istream& input, ostream& output, CryptingKey key)
 	while (getline(input, line))
 	{
 		output << DecryptString(line, key);
-		if (!output.eof())
+		if (!input.eof())
 		{
-			output << endl;
+			output << DecryptByte('\n', key);
 		}
 	}
 }
