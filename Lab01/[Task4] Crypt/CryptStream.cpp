@@ -60,6 +60,7 @@ string CryptString(const string& srcStr, CryptingKey key)
 
 string DecryptString(const string& cryptedStr, CryptingKey key)
 {
+
 	string decryptedString = "";
 	for (const auto& symbol : cryptedStr)
 	{
