@@ -6,7 +6,6 @@
 
 using namespace std;
 
-
 char mapBitsInByte(char byteToMapping, char byteFromMapping, size_t bitIndexTo, size_t bitIndexFrom)
 {
 	size_t mask = static_cast<size_t>(pow(2, bitIndexFrom));
