@@ -114,8 +114,3 @@ bool verifyKeyValue(int key)
 	bool isValueInRange = key >= 0 && key <= 255;
 	return isValueInRange;
 }
-
-/*
-	TODO: полирнуть код
-	TODO: тесты тест тесты
-*/
