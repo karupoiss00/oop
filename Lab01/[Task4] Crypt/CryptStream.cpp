@@ -6,9 +6,9 @@
 
 using namespace std;
 
-char MapBitsInByte(char byteToMapping, char byteFromMapping, size_t bitIndexTo, size_t bitIndexFrom)
+char MapBitsInByte(char byteToMapping, char byteFromMapping, unsigned bitIndexTo, unsigned bitIndexFrom)
 {
-	size_t mask = 1 << bitIndexFrom;
+	unsigned mask = 1 << bitIndexFrom;
 	int shift = bitIndexTo - bitIndexFrom;
 	if (shift > 0)
 	{

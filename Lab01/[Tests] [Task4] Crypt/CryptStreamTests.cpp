@@ -66,6 +66,7 @@ TEST_CASE("CryptStream: Only spaces multi line string")
 {
 	std::string srcMessage = "     \n     \n     \n";
 	CryptingKey key = 1;
+	
 	std::istringstream inputNotCrypted(srcMessage);
 	std::ostringstream outputCrypted;
 	CryptStream(inputNotCrypted, outputCrypted, key);
@@ -83,6 +84,7 @@ TEST_CASE("CryptStream: Only line breaks string")
 {
 	std::string srcMessage = "\n\n\n\n\n\n\n\n";
 	CryptingKey key = 1;
+	
 	std::istringstream inputNotCrypted(srcMessage);
 	std::ostringstream outputCrypted;
 	CryptStream(inputNotCrypted, outputCrypted, key);
@@ -100,6 +102,7 @@ TEST_CASE("CryptStream: \'C\' chars converting to \n")
 {
 	std::string srcMessage = "CCCCCC\n";
 	CryptingKey key = 1;
+	
 	std::istringstream inputNotCrypted(srcMessage);
 	std::ostringstream outputCrypted;
 	CryptStream(inputNotCrypted, outputCrypted, key);
