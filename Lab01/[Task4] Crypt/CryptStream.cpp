@@ -6,9 +6,9 @@
 
 using namespace std;
 
-char mapBitsInByte(char byteToMapping, char byteFromMapping, size_t bitIndexTo, size_t bitIndexFrom)
+char MapBitsInByte(char byteToMapping, char byteFromMapping, size_t bitIndexTo, size_t bitIndexFrom)
 {
-	size_t mask = static_cast<size_t>(pow(2, bitIndexFrom));
+	size_t mask = 1 << bitIndexFrom;
 	int shift = bitIndexTo - bitIndexFrom;
 	if (shift > 0)
 	{
@@ -29,7 +29,7 @@ char CryptByte(char srcByte, CryptingKey key)
 
 	for (const auto& [srcBitIndex, destBitIndex] : cryptingMap)
 	{
-		cryptedByte = mapBitsInByte(cryptedByte, xoredSrcByte, destBitIndex, srcBitIndex);
+		cryptedByte = MapBitsInByte(cryptedByte, xoredSrcByte, destBitIndex, srcBitIndex);
 	}
 
 	return cryptedByte;
@@ -41,7 +41,7 @@ char DecryptByte(char cryptedByte, CryptingKey key)
 
 	for (const auto& [destBitIndex, srcBitIndex] : cryptingMap)
 	{
-		decryptedByte = mapBitsInByte(decryptedByte, cryptedByte, destBitIndex, srcBitIndex);
+		decryptedByte = MapBitsInByte(decryptedByte, cryptedByte, destBitIndex, srcBitIndex);
 	}
 	return decryptedByte ^ key;
 }

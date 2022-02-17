@@ -1,13 +1,19 @@
 #pragma once
 #include <map>
-#include <fstream>
+#include <istream>
 
 using CryptingKey = unsigned char;
 
-const size_t BYTE_SIZE = 8;
-const std::string_view CRYPT_OPERATION = "crypt";
-const std::string_view DECRYPT_OPERATION = "decrypt";
-const std::map<size_t, size_t> cryptingMap = {
+enum class Operations
+{
+	Crypt,
+	Decrypt
+};
+
+constexpr size_t BYTE_SIZE = 8;
+const std::string_view CRYPT_OPERATION_NAME = "crypt";
+const std::string_view DECRYPT_OPERATION_NAME = "decrypt";
+const std::map<unsigned, unsigned> cryptingMap = {
 	{0, 2},
 	{1, 3},
 	{2, 4},
