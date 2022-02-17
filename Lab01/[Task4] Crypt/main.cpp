@@ -2,9 +2,12 @@
 #include <fstream>
 #include <string>
 #include <optional>
+#include <functional>
 #include "CryptStream.h"
 
 using namespace std;
+
+using TranformerFn = std::function<void(istream& input, ostream& output)>;
 
 struct Args
 {
@@ -17,8 +20,8 @@ struct Args
 optional<Args> ParseArgs(int argc, char* argv[]);
 bool IsKeyValueVaild(int key);
 bool IsOperationNameValid(const string & operation);
-void CryptFile(const string & inputFileName, const string & outputFileName, CryptingKey key, bool & withError);
-void DecryptFile(const string & inputFileName, const string & outputFileName, CryptingKey key, bool & withError);
+void TranformFile(const string& inputFileName, const string& outputFileName,
+	TranformerFn transformerFn, bool& wasError);
 
 int main(int argc, char* argv[])
 {
@@ -33,11 +36,21 @@ int main(int argc, char* argv[])
 	
 	if (args->operation == Operations::Crypt)
 	{
-		CryptFile(args->inputFileName, args->outputFileName, args->key, wasError);
+		TranformFile(args->inputFileName, args->outputFileName,
+			[args](istream& input, ostream& output)
+			{
+				CryptStream(input, output, args->key);
+			},
+			wasError);
 	}
 	else
 	{
-		DecryptFile(args->inputFileName, args->outputFileName, args->key, wasError);
+		TranformFile(args->inputFileName, args->outputFileName,
+			[args](istream& input, ostream& output)
+			{
+				DecryptStream(input, output, args->key);
+			},
+			wasError);
 	}
 
 	if (wasError)
@@ -69,15 +82,7 @@ optional<Args> ParseArgs(int argc, char* argv[])
 		cout << "Please, use \"crypt\" or \"decrypt\" as first argument." << endl;
 		return nullopt;
 	}
-
-	if (!operationName.compare(CRYPT_OPERATION_NAME))
-	{
-		args.operation = Operations::Crypt;
-	}
-	else
-	{
-		args.operation = Operations::Decrypt;
-	}
+	args.operation = operationsMap.find(operationName)->second;
 
 	try 
 	{
@@ -98,15 +103,10 @@ optional<Args> ParseArgs(int argc, char* argv[])
 	return args;
 }
 
-bool AreEqualStrings(const string& s1, const string& s2) 
-{
-	return !s1.compare(s2);
-}
-
 bool IsOperationNameValid(const string& operation) 
 {
-	bool isCryptOperation = !operation.compare(CRYPT_OPERATION_NAME);
-	bool isDeryptOperation = !operation.compare(DECRYPT_OPERATION_NAME);
+	bool isCryptOperation = operation == CRYPT_OPERATION_NAME;
+	bool isDeryptOperation = operation == DECRYPT_OPERATION_NAME;
 	return isCryptOperation || isDeryptOperation;
 }
 
@@ -116,7 +116,8 @@ bool IsKeyValueVaild(int key)
 	return isValueInRange;
 }
 
-void CryptFile(const string& inputFileName, const string& outputFileName, CryptingKey key, bool & wasError)
+void TranformFile(const string& inputFileName, const string& outputFileName,
+	TranformerFn transformerFn, bool& wasError)
 {
 	ifstream input;
 	input.open(inputFileName, ios::binary);
@@ -138,59 +139,18 @@ void CryptFile(const string& inputFileName, const string& outputFileName, Crypti
 		return;
 	}
 
-	CryptStream(input, output, key);
+	transformerFn(input, output);
 
 	if (input.bad())
 	{
-		cout << "Falied to read data from input file\n";
+		cout << "Falied to read data from input file" << endl;
 		wasError = true;
 		return;
 	}
 
 	if (!output.flush())
 	{
-		cout << "Failed to write data to output file\n";
-		wasError = true;
-		return;
-	}
-
-	return;
-}
-
-void DecryptFile(const string & inputFileName, const string & outputFileName, const CryptingKey key, bool & wasError)
-{
-	ifstream input;
-	input.open(inputFileName, ios::binary);
-
-	if (!input.is_open())
-	{
-		cout << "Failed to open '" << inputFileName << "' for reading" << endl;
-		wasError = true;
-		return;
-	}
-
-	ofstream output;
-	output.open(outputFileName, ios::binary);
-
-	if (!output.is_open())
-	{
-		cout << "Failed to open '" << outputFileName << "' for writing" << endl;
-		wasError = true;
-		return;
-	}
-
-	DecryptStream(input, output, key);
-
-	if (input.bad())
-	{
-		cout << "Falied to read data from input file\n";
-		wasError = true;
-		return;
-	}
-
-	if (!output.flush())
-	{
-		cout << "Failed to write data to output file\n";
+		cout << "Failed to write data to output file" << endl;
 		wasError = true;
 		return;
 	}
