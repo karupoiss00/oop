@@ -18,8 +18,6 @@ struct Args
 };
 
 optional<Args> ParseArgs(int argc, char* argv[]);
-bool IsKeyValueVaild(int key);
-bool IsOperationNameValid(const string & operation);
 void TranformFile(const string& inputFileName, const string& outputFileName,
 	TranformerFn transformerFn, bool& wasError);
 
@@ -61,6 +59,28 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
+bool IsKeyValueVaild(int key)
+{
+	bool isValueInRange = key >= 0 && key <= 255;
+	return isValueInRange;
+}
+
+optional<Operations> MapStringToOperation(const std::string operationName)
+{
+	if (operationName == CRYPT_OPERATION_NAME)
+	{
+		return Operations::Crypt;
+	}
+	else if (operationName == DECRYPT_OPERATION_NAME)
+	{
+		return Operations::Decrypt;
+	}
+	else
+	{
+		return nullopt;
+	}
+}
+
 optional<Args> ParseArgs(int argc, char* argv[])
 {
 	if (argc != 5)
@@ -76,17 +96,20 @@ optional<Args> ParseArgs(int argc, char* argv[])
 	
 	const string operationName = argv[1];
 
-	if (!IsOperationNameValid(operationName))
+	auto operation = MapStringToOperation(operationName);
+	
+	if (!operation)
 	{
 		cout << "Error! Unknown operation." << endl;
 		cout << "Please, use \"crypt\" or \"decrypt\" as first argument." << endl;
 		return nullopt;
 	}
-	args.operation = operationsMap.find(operationName)->second;
+
+	args.operation = operation.value();
 
 	try 
 	{
-		int keyValue = atoi(argv[4]);
+		int keyValue = stoi(argv[4]);
 		if (!IsKeyValueVaild(keyValue))
 		{
 			cout << "Error! Key must be number in range from 0 to 255." << endl;
@@ -101,19 +124,6 @@ optional<Args> ParseArgs(int argc, char* argv[])
 	}
 
 	return args;
-}
-
-bool IsOperationNameValid(const string& operation) 
-{
-	bool isCryptOperation = operation == CRYPT_OPERATION_NAME;
-	bool isDeryptOperation = operation == DECRYPT_OPERATION_NAME;
-	return isCryptOperation || isDeryptOperation;
-}
-
-bool IsKeyValueVaild(int key) 
-{
-	bool isValueInRange = key >= 0 && key <= 255;
-	return isValueInRange;
 }
 
 void TranformFile(const string& inputFileName, const string& outputFileName,

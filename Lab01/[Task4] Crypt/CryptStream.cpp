@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <optional>
 #include "CryptStream.h"
 
 using namespace std;

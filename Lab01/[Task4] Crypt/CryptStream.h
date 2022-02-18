@@ -5,20 +5,16 @@
 
 using CryptingKey = unsigned char;
 
+
 enum class Operations
 {
 	Crypt,
 	Decrypt
 };
 
-constexpr size_t BYTE_SIZE = 8;
 const std::string_view CRYPT_OPERATION_NAME = "crypt";
 const std::string_view DECRYPT_OPERATION_NAME = "decrypt";
-
-const std::map<std::string_view, Operations> operationsMap = {
-	{CRYPT_OPERATION_NAME, Operations::Crypt},
-	{DECRYPT_OPERATION_NAME, Operations::Decrypt},
-};
+constexpr size_t BYTE_SIZE = 8;
 const std::array<std::pair<unsigned, unsigned>, 8> cryptingMap = {
 	std::pair(0, 2),
 	std::pair(1, 3),
@@ -32,3 +28,4 @@ const std::array<std::pair<unsigned, unsigned>, 8> cryptingMap = {
 
 void CryptStream(std::istream& input, std::ostream& output, CryptingKey key);
 void DecryptStream(std::istream& input, std::ostream& output, CryptingKey key);
+std::optional<Operations> MapStringToOperation(const std::string operationName);
