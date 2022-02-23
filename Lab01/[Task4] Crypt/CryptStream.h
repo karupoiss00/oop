@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include <array>
+#include <optional>
 #include <istream>
 
 using CryptingKey = unsigned char;
