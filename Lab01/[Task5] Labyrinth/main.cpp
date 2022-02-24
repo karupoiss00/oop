@@ -46,7 +46,6 @@ int main(int argc, char* argv[])
 
 	if (wasError)
 	{
-		cout << "kal" << endl;
 		return 1;
 	}
 
