@@ -368,22 +368,22 @@ void PaveShortestWay(Labyrinth & labyrinth, bool & wasError)
 
 	Coordinates currentCell = exitCellCoordinates.value();
 
-	while (true)
+	auto nextCell = SearchNextNeighbour(wavedLabyrinth, currentCell);
+
+	while(nextCell
+		&& labyrinthWithWay[nextCell->m_y][nextCell->m_x] != LABYRINTH_CELL_START)
 	{
-		auto nextCell = SearchNextNeighbour(wavedLabyrinth, currentCell);
-
-		if (!nextCell)
-		{
-			return;
-		}
-
-		if (labyrinthWithWay[nextCell->m_y][nextCell->m_x] == LABYRINTH_CELL_START)
-		{
-			labyrinth = labyrinthWithWay;
-			return;
-		}
 		labyrinthWithWay[nextCell->m_y][nextCell->m_x] = LABYRINTH_CELL_WAY;
 
 		currentCell = nextCell.value();
+
+		nextCell = SearchNextNeighbour(wavedLabyrinth, currentCell);
+	};
+
+	if (nextCell)
+	{
+		labyrinth = labyrinthWithWay;
 	}
+
+	return;
 };
