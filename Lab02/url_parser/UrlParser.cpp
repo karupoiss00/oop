@@ -108,11 +108,6 @@ bool ParseURL(string const& url, Protocol& protocol, unsigned& port, string& hos
 	smatch matches;
 	bool matchesFound = regex_search(url, matches, urlRegExp);
 
-	for (unsigned i = 0; i < matches.size(); i++)
-	{
-		cout << matches[i] << endl;
-	}
-
 	if (!matchesFound)
 	{
 		return false;

@@ -7,7 +7,7 @@ using namespace std;
 
 struct Args
 {
-	std::string url;
+	string url;
 };
 
 optional<Args> ParseArgs(int argc, char* argv[]);
