@@ -1,182 +1,57 @@
 #include <iostream>
-#include <regex>
+#include <string>
 #include <optional>
+#include "UrlParser.h"
 
 using namespace std;
 
-enum class Protocol
+struct Args
 {
-	HTTP,
-	HTTPS,
-	FTP,
+	std::string url;
 };
 
-bool ParseURL(string const& url, Protocol& protocol, unsigned& port, string& host, string& document);
+optional<Args> ParseArgs(int argc, char* argv[]);
 
 int main(int argc, char* argv[])
 {
+	auto args = ParseArgs(argc, argv);
+
+	if (!args)
+	{
+		return 1;
+	}
+
 	Protocol protocol;
 	unsigned port;
 	string host;
 	string document;
 
-	return 0;
-}
-
-optional<Protocol> MapStringToProtocol(const string& protocol)
-{
-	if (protocol == "http")
+	if (ParseURL(args->url, protocol, port, host, document))
 	{
-		return Protocol::HTTP;
-	}
-
-	if (protocol == "https")
-	{
-		return Protocol::HTTPS;
-	}
-
-	if (protocol == "ftp")
-	{
-		return Protocol::FTP;
-	}
-
-	return nullopt;
-}
-
-unsigned MapProtocolToPort(const Protocol& protocol)
-{
-	switch (protocol)
-	{
-		case Protocol::HTTP:
-			return 80;
-		case Protocol::HTTPS:
-			return 443;
-		case Protocol::FTP:
-			return 21;
-	}
-}
-
-bool ProcessTwoMatches(const smatch& matches, Protocol& protocol, unsigned& port, string& host, string& document)
-{
-	if (matches.size() != 2)
-	{
-		return false;
-	}
-
-	const auto protocolFromString = MapStringToProtocol(matches[0]);
-
-	if (!protocolFromString)
-	{
-		return false;
-	}
-
-	protocol = protocolFromString.value();
-	host = matches[1];
-	port = MapProtocolToPort(protocolFromString.value());
-	document = "/";
-
-	return true;
-}
-
-bool ProcessThreeMatches(const smatch& matches, Protocol& protocol, unsigned& port, string& host, string& document)
-{
-	if (matches.size() != 3)
-	{
-		return false;
-	}
-
-	const auto protocolFromString = MapStringToProtocol(matches[0]);
-
-	if (!protocolFromString)
-	{
-		return false;
-	}
-
-	string portOrDocument = matches[2];
-
-	if (portOrDocument[0] == ':')
-	{
-		try
-		{
-			port = stoi(portOrDocument.substr(1, portOrDocument.length() - 1));
-		}
-		catch (std::exception e)
-		{
-			cout << e.what() << endl;
-			return false;
-		}
+		cout << args->url << endl;
+		cout << "HOST: " << host << endl;
+		cout << "PORT: " << port << endl;
+		cout << "DOC: " << document << endl;
 	}
 	else
 	{
-		document = portOrDocument;
-		port = MapProtocolToPort(protocolFromString.value());
+		cout << "Error: invalid url" << endl;
 	}
 
-	protocol = protocolFromString.value();
-	host = matches[1];
-
-	return true;
+	return 0;
 }
 
-bool ProcessFourMatches(const smatch& matches, Protocol& protocol, unsigned& port, string& host, string& document)
+optional<Args> ParseArgs(int argc, char* argv[])
 {
-	if (matches.size() != 4)
+	if (argc != 2)
 	{
-		return false;
+		cout << "Invalid arguments count" << endl;
+		cout << "Usage: url_parser.exe <url>" << endl;
+		return nullopt;
 	}
 
-	const auto protocolFromString = MapStringToProtocol(matches[0]);
+	Args args;
+	args.url = argv[1];
 
-	if (!protocolFromString)
-	{
-		return false;
-	}
-
-	try
-	{
-		port = stoi(matches[2]);
-	}
-	catch (std::exception e)
-	{
-		cout << e.what() << endl;
-		return false;
-	}
-
-	protocol = protocolFromString.value();
-	host = matches[1];
-	document = matches[3];
-
-	return true;
-}
-
-bool ParseURL(string const& url, Protocol& protocol, unsigned& port, string& host, string& document)
-{
-	const regex urlRegExp(
-		R"(
-		^(https|http|ftp)?
-		:\/\/
-		([\w-]{1,63}(?:\.[\w-]{1,63})+)
-		(:\d{1,5})?
-		(\/[^\s@]*)*$
-	)");
-
-	smatch matches;
-	bool matchesFound = regex_search(url, matches, urlRegExp);
-
-	if (!matchesFound)
-	{
-		return false;
-	}
-
-	switch (matches.size())
-	{
-		case 2:
-			return ProcessTwoMatches(matches, protocol, port, host, document);
-		case 3:
-			return ProcessThreeMatches(matches, protocol, port, host, document);
-		case 4:
-			return ProcessFourMatches(matches, protocol, port, host, document);
-		default:
-			return false;
-	}
+	return args;
 }
