@@ -1,5 +1,6 @@
 #include <iostream>
 #include <optional>
+#include <cassert>
 #include "UrlParser.h"
 
 using namespace std;
@@ -39,71 +40,89 @@ unsigned MapProtocolToPort(const Protocol& protocol)
 		return 443;
 	case Protocol::FTP:
 		return 21;
+	default:
+		assert(false);
+		return 0;
 	}
 }
 
-string TrimFirstChar(const string& str)
+optional<unsigned> ParsePortFromString(string portStr)
 {
-	return str.substr(1, str.length() - 1);
+	try
+	{
+		unsigned parsedPort = stoi(portStr);
+		if (!IsValidPort(parsedPort))
+		{
+			return nullopt;
+		}
+		else
+		{
+			return parsedPort;
+		}
+	}
+	catch (std::exception& e)
+	{
+		cout << e.what() << endl;
+		return nullopt;
+	}
+}
+
+optional<unsigned> ParsePort(string portMatch, Protocol protocol)
+{
+	if (!portMatch.empty())
+	{
+		auto parsedPortOpt = ParsePortFromString(portMatch);
+		if (parsedPortOpt)
+		{
+			return parsedPortOpt.value();
+		}
+		return nullopt;
+	}
+	
+	return MapProtocolToPort(protocol);
 }
 
 bool ProcessMatches(const smatch& matches, Protocol& protocol, unsigned& port, string& host, string& document)
 {
-	const auto protocolFromString = MapStringToProtocol(matches[1]);
-
-	if (!protocolFromString)
+	if (matches.size() != MATCHES_COUNT)
 	{
 		return false;
 	}
 
-	try
+	const auto parsedProtocolOpt = MapStringToProtocol(matches[PROTOCOL_MATCH]);
+
+	if (!parsedProtocolOpt)
 	{
-		string portStr = matches[3].str();
-		if (!portStr.length())
-		{
-			port = MapProtocolToPort(protocolFromString.value());
-		}
-		else
-		{
-			port = stoi(TrimFirstChar(portStr));
-			if (!IsValidPort(port))
-			{
-				return false;
-			}
-		}
-	}
-	catch (std::exception e)
-	{
-		cout << e.what() << endl;
 		return false;
 	}
+	
+	Protocol parsedProtocol = parsedProtocolOpt.value();
 
-	protocol = protocolFromString.value();
+	const auto parsedPortOpt = ParsePort(matches[PORT_MATCH], parsedProtocol);
 
-	if (!matches[2].length())
+	if (!parsedPortOpt)
 	{
 		return false;
 	}
 
-	host = matches[2];
+	unsigned parsedPort = parsedPortOpt.value();
 
-	if (matches[4].length())
+	if (!matches[HOST_MATCH].length())
 	{
-		document = TrimFirstChar(matches[4]);
+		return false;
 	}
-	else
-	{
-		document = "";
-	}
+
+	host = matches[HOST_MATCH];
+	protocol = parsedProtocol;
+	port = parsedPort;
+	document = matches[DOCUMENT_MATCH];
 	
 	return true;
 }
 
 bool ParseURL(string const& url, Protocol& protocol, unsigned& port, string& host, string& document)
 {
-	const regex urlRegExp(
-		R"(^(https|http|ftp)?://([\w-]{1,63}(?:\.[\w-]{1,63})+)(:\d{1,5})?(/[^\s@]*)*$)"
-	);
+	const regex urlRegExp(URL_REGULAR_EXPRESSION);
 
 	smatch matches;
 	bool matchesFound = regex_search(url, matches, urlRegExp);
