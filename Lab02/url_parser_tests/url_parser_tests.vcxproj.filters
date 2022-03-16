@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Module FIles">
+      <UniqueIdentifier>{20cb9233-f202-42b0-9361-a09fa59abda9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tests Files">
+      <UniqueIdentifier>{fe8b1ff9-2ab8-49d2-865b-7972633c6593}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\url_parser\UrlParser.cpp">
+      <Filter>Module FIles</Filter>
+    </ClCompile>
+    <ClCompile Include="UrlParserTests.cpp">
+      <Filter>Tests Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\url_parser\UrlParser.h">
+      <Filter>Module FIles</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
