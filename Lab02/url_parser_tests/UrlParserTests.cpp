@@ -129,3 +129,17 @@ TEST_CASE("incorrect url parsing test")
 	REQUIRE(!result1);
 	REQUIRE(!result2);
 }
+
+TEST_CASE("uppercase protocol parsing test")
+{
+	const string url = "hTTps://:8000/documentLevel1/documentLevel2/index.html";
+
+	Protocol protocol;
+	unsigned port;
+	string host;
+	string document;
+
+	const bool result = ParseURL(url, protocol, port, host, document);
+
+	REQUIRE(!result);
+}

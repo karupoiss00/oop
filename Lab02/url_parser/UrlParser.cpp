@@ -5,8 +5,19 @@
 
 using namespace std;
 
+void StringToLowerCase(string s) 
+{
+	std::transform(s.begin(), s.end(), s.begin(),
+		[](unsigned char c)
+		{
+			return std::tolower(c); 
+		}
+	);
+}
+
 optional<Protocol> MapStringToProtocol(const string& protocol)
 {
+	StringToLowerCase(protocol);
 	if (protocol == "http")
 	{
 		return Protocol::HTTP;
