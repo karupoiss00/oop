@@ -1,0 +1,16 @@
+{
+  
+  parallelepiped 7800 0.1 0.1 0.1
+  sphere 7800 0.5
+  cone 7800 0.2 0.15
+  cylinder 7800 0.2 0.15
+  compound
+  {
+    sphere 19300 0.8
+    sphere 21500 1
+    compound
+    {
+    }
+  }
+  sphere  500 2
+}

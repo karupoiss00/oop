@@ -131,6 +131,8 @@
     <ClCompile Include="BodyType.cpp" />
     <ClCompile Include="Compound.cpp" />
     <ClCompile Include="Cone.cpp" />
+    <ClCompile Include="Cylinder.cpp" />
+    <ClCompile Include="BodyFactory.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Parallelepiped.cpp" />
     <ClCompile Include="SolidBody.cpp" />
@@ -138,9 +140,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Body.h" />
+    <ClInclude Include="BodyFactory.h" />
     <ClInclude Include="BodyType.h" />
     <ClInclude Include="Compound.h" />
     <ClInclude Include="Cone.h" />
+    <ClInclude Include="Cylinder.h" />
     <ClInclude Include="Parallelepiped.h" />
     <ClInclude Include="SolidBody.h" />
     <ClInclude Include="Sphere.h" />
