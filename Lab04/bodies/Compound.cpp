@@ -84,9 +84,9 @@ void CCompound::AppendProperties(ostream& os) const
 {
 	os << string(m_nestingLevel + 2, ' ') << "{" << endl;
 
-	for (size_t i = 0; i < m_bodies.size(); ++i)
+	for (const auto & body : m_bodies)
 	{
-		os << m_bodies[i]->ToString();
+		os << body->ToString();
 	}
 
 	os << string(m_nestingLevel + 2, ' ') << "}" << endl;

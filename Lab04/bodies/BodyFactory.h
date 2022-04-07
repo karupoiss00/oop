@@ -9,10 +9,10 @@ public:
 	CBodyFactory();
 
 	void CreateBodies(Bodies& bodies, std::istream& strm);
-	void SetPrintIndent(unsigned nestingLevel);
+	void SetNestingLevel(unsigned nestingLevel);
 	void SetDelimiters(char openDelimiter, char closeDelimiter);
 
-protected:
+private:
 	using ActionMap = std::map<std::string, std::function<body_ptr()>>;
 
 	ActionMap m_actionMap;

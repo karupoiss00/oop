@@ -10,11 +10,9 @@
 #include "Compound.h"
 
 using namespace std;
-using namespace std::placeholders;
 
 CBodyFactory::CBodyFactory()
 	: m_nestingLevel(0), m_openDelimiter('{'), m_closeDelimiter('}') {}
-
 
 void CBodyFactory::CreateBodies(Bodies& bodies, istream& strm)
 {
@@ -163,7 +161,7 @@ bool CBodyFactory::ExecuteAction(Bodies& bodies, const string& action, const vec
 	return true;
 }
 
-void CBodyFactory::SetPrintIndent(unsigned nestingLevel)
+void CBodyFactory::SetNestingLevel(unsigned nestingLevel)
 {
 	m_nestingLevel = nestingLevel;
 }

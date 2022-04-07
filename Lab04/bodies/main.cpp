@@ -15,7 +15,6 @@ void ShowInfoAboutBodyWithMaxMass(const Bodies& bodies);
 void ShowInfoAboutBodyWithMinWeightInWater(const Bodies& bodies);
 void PrintHelp();
 
-
 int main(int argc, char* argv[])
 {
 	Bodies bodies;
@@ -30,7 +29,7 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		if (static_cast<string>(argv[1]) == "--help")
+		if (argv[1] == "--help")
 		{
 			PrintHelp();
 			return 0;
@@ -87,9 +86,9 @@ bool CreateBodiesFromFile(const string& fileName, Bodies& bodies)
 
 void ShowInfoAboutBodies(const Bodies& bodies)
 {
-	for (size_t i = 0; i < bodies.size(); ++i)
+	for (const auto& body : bodies)
 	{
-		cout << bodies[i]->ToString();
+		cout << body->ToString();
 	}
 }
 
@@ -133,8 +132,8 @@ body_ptr BodyWithMinWeightInWater(const Bodies& bodies)
 
 	auto CompareBodies = [&](body_ptr const& a, body_ptr const& b) -> bool
 	{
-		double aWeight = (a->GetDensity() - waterDensity) * g * a->GetVolume();
-		double bWeight = (b->GetDensity() - waterDensity) * g * b->GetVolume();
+		double aWeight = a->GetVolume() * (a->GetDensity() - waterDensity) * g;
+		double bWeight = b->GetVolume() * (b->GetDensity() - waterDensity) * g;
 
 		return aWeight < bWeight;
 	};
@@ -143,7 +142,6 @@ body_ptr BodyWithMinWeightInWater(const Bodies& bodies)
 
 	return *body;
 }
-
 
 void ShowInfoAboutBodyWithMinWeightInWater(const Bodies& bodies)
 {
@@ -158,7 +156,7 @@ void ShowInfoAboutBodyWithMinWeightInWater(const Bodies& bodies)
 
 void PrintHelp()
 {
-	cout << endl << "Usage: bodies.exe <script file>" << endl << endl;
+	cout << "Usage: bodies.exe <script file>" << endl;
 	cout << "Use following syntax and commands to create bodies:" << endl << endl;
 	cout << "{" << endl << "  sphere <density> <radius>" << endl;
 	cout << "  cone <density> <radius of base> <height>" << endl;
