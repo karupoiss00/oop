@@ -95,6 +95,43 @@ TEST_CASE("document parsing test")
 	REQUIRE(document == "documentLevel1/documentLevel2/index.html");
 }
 
+
+TEST_CASE("uppercase protocol parsing test")
+{
+	const string url = "hTTps://localhost:8000/documentLevel1/documentLevel2/index.html";
+
+	Protocol protocol;
+	unsigned port;
+	string host;
+	string document;
+
+	const bool result = ParseURL(url, protocol, port, host, document);
+
+	REQUIRE(result);
+	REQUIRE(protocol == Protocol::HTTPS);
+	REQUIRE(port == 8000);
+	REQUIRE(host == "localhost");
+	REQUIRE(document == "documentLevel1/documentLevel2/index.html");
+}
+
+TEST_CASE("port value is out of range")
+{
+	const string url = "ftp://localhost:65535/documentLevel1/documentLevel2/index.html";
+
+	Protocol protocol;
+	unsigned port;
+	string host;
+	string document;
+
+	const bool result = ParseURL(url, protocol, port, host, document);
+
+	REQUIRE(result);
+	REQUIRE(protocol == Protocol::FTP);
+	REQUIRE(port == 65535);
+	REQUIRE(host == "localhost");
+	REQUIRE(document == "documentLevel1/documentLevel2/index.html");
+}
+
 TEST_CASE("incorrect port parsing test")
 {
 	const string urlPortOutOfRange = "https://oop.com:66000/";
@@ -111,7 +148,6 @@ TEST_CASE("incorrect port parsing test")
 	REQUIRE(!resultPortOutOfRange);
 	REQUIRE(!resultIncorrectPortChars);
 }
-
 
 TEST_CASE("incorrect url parsing test")
 {
@@ -130,9 +166,9 @@ TEST_CASE("incorrect url parsing test")
 	REQUIRE(!result2);
 }
 
-TEST_CASE("uppercase protocol parsing test")
+TEST_CASE("port value can not be in document part")
 {
-	const string url = "hTTps://:8000/documentLevel1/documentLevel2/index.html";
+	const string url = "https://localhost/:8000/documentLevel2/index.html";
 
 	Protocol protocol;
 	unsigned port;

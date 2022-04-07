@@ -5,30 +5,33 @@
 
 using namespace std;
 
-void StringToLowerCase(string s) 
+string StringToLowerCase(const string& s) 
 {
-	std::transform(s.begin(), s.end(), s.begin(),
-		[](unsigned char c)
+	string result = s;
+	std::transform(result.begin(), result.end(), result.begin(),
+		[](char c)
 		{
 			return std::tolower(c); 
 		}
 	);
+	return result;
 }
 
 optional<Protocol> MapStringToProtocol(const string& protocol)
 {
-	StringToLowerCase(protocol);
-	if (protocol == "http")
+	string ignoredCaseProtocol = StringToLowerCase(protocol);
+
+	if (ignoredCaseProtocol == "http")
 	{
 		return Protocol::HTTP;
 	}
 
-	if (protocol == "https")
+	if (ignoredCaseProtocol == "https")
 	{
 		return Protocol::HTTPS;
 	}
 
-	if (protocol == "ftp")
+	if (ignoredCaseProtocol == "ftp")
 	{
 		return Protocol::FTP;
 	}
@@ -133,7 +136,7 @@ bool ProcessMatches(const smatch& matches, Protocol& protocol, unsigned& port, s
 
 bool ParseURL(string const& url, Protocol& protocol, unsigned& port, string& host, string& document)
 {
-	const regex urlRegExp(URL_REGULAR_EXPRESSION);
+	const regex urlRegExp(URL_REGULAR_EXPRESSION, std::regex_constants::icase);
 
 	smatch matches;
 	bool matchesFound = regex_search(url, matches, urlRegExp);
