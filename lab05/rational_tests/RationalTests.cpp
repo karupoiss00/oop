@@ -10,15 +10,30 @@ struct ExpectedRationalState
 	}
 
 	int numerator;
-	unsigned denominator;
+	int denominator;
 	double value;
 };
 
-void RationalExpectation(const CRational& recieved,const ExpectedRationalState& expected)
+struct ExpectedCompoundFraction
+{
+	ExpectedCompoundFraction(int wholeValue, CRational rationalValue)
+		: whole(wholeValue), rational(rationalValue) {};
+
+	int whole;
+	CRational rational;
+};
+
+void RationalExpectation(CRational const& recieved, ExpectedRationalState const& expected)
 {
 	REQUIRE(recieved.GetNumerator() == expected.numerator);
 	REQUIRE(recieved.GetDenominator() == expected.denominator);
 	REQUIRE(recieved.ToDouble() == Approx(expected.value).epsilon(1.e-3f));
+}
+
+void CompoundFractionExpectation(std::pair<int, CRational> const& recieved, ExpectedCompoundFraction const& expected)
+{
+	REQUIRE(recieved.first == expected.whole);
+	REQUIRE(recieved.second == expected.rational);
 }
 
 SCENARIO("Rational creation")
@@ -106,11 +121,10 @@ SCENARIO("Rational creation")
 			AND_WHEN("denominator is negative")
 			{
 				int denominator = -10;
-				const auto initZeroRational = [&]()
-				{
-					CRational rational(numerator, denominator);
-				};
-				REQUIRE_THROWS(initZeroRational());
+				ExpectedRationalState expected(0, DEFAULT_DENOMINATOR);
+				CRational rational(numerator, denominator);
+
+				RationalExpectation(rational, expected);
 			}
 		}
 		WHEN("denominator is zero")
@@ -867,6 +881,10 @@ void BiggerRationalTest(CRational first, CRational second, bool expectedResult)
 
 SCENARIO("> operator applying")
 {
+	CHECK(CRational(1, 2) > CRational(1, 4));
+	CHECK(!(CRational(1, 2) > CRational(1, 2)));
+	CHECK(!(CRational(1, 2) > CRational(3, 4)));
+	/*
 	GIVEN("zero rational")
 	{
 		AND_GIVEN("zero rational")
@@ -904,6 +922,7 @@ SCENARIO("> operator applying")
 			BiggerRationalTest(firstRational, CRational(44, 90), true);
 		}
 	}
+	*/
 }
 
 void BiggerOrEqualRationalTest(CRational first, CRational second, bool expectedResult)
@@ -1047,4 +1066,26 @@ SCENARIO("<= operator applying")
 			SmallerOrEqualRationalTest(firstRational, CRational(44, 90), false);
 		}
 	}
+}
+
+void ToCompoundFractionTest(CRational rational, int whole, CRational remaindedPart)
+{
+	const auto recieved = rational.ToCompoundFraction();
+	const auto expected = ExpectedCompoundFraction(whole, remaindedPart);
+	CompoundFractionExpectation(recieved, expected);
+}
+
+TEST_CASE("ToCompoundFraction: whole part < 0")
+{
+	ToCompoundFractionTest(CRational(-5, 4), -1, CRational(-1, 4));
+}
+
+TEST_CASE("ToCompoundFraction: whole part = 0")
+{
+	ToCompoundFractionTest(CRational(3, 4), 0, CRational(3, 4));
+}
+
+TEST_CASE("ToCompoundFraction: whole part > 0")
+{
+	ToCompoundFractionTest(CRational(5, 4), 1, CRational(1, 4));
 }

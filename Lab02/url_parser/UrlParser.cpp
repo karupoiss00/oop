@@ -9,7 +9,7 @@ string StringToLowerCase(const string& s)
 {
 	string result = s;
 	std::transform(result.begin(), result.end(), result.begin(),
-		[](char c)
+		[](unsigned char c)
 		{
 			return std::tolower(c); 
 		}
@@ -19,19 +19,19 @@ string StringToLowerCase(const string& s)
 
 optional<Protocol> MapStringToProtocol(const string& protocol)
 {
-	string ignoredCaseProtocol = StringToLowerCase(protocol);
+	string caseInsensetiveProtocol = StringToLowerCase(protocol);
 
-	if (ignoredCaseProtocol == "http")
+	if (caseInsensetiveProtocol == "http")
 	{
 		return Protocol::HTTP;
 	}
 
-	if (ignoredCaseProtocol == "https")
+	if (caseInsensetiveProtocol == "https")
 	{
 		return Protocol::HTTPS;
 	}
 
-	if (ignoredCaseProtocol == "ftp")
+	if (caseInsensetiveProtocol == "ftp")
 	{
 		return Protocol::FTP;
 	}

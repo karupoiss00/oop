@@ -1,4 +1,5 @@
 #include <math.h>
+#include <numeric>
 #include <stdexcept>
 #include "Rational.h"
 
@@ -12,10 +13,6 @@ CRational::CRational(int value)
 
 CRational::CRational(int numerator, int denominator)
 {
-	if (numerator == 0)
-	{
-		throw invalid_argument("numerator must be not zero");
-	}
 	if (denominator == 0)
 	{
 		throw invalid_argument("denominator must be not zero");
@@ -29,28 +26,18 @@ CRational::CRational(int numerator, int denominator)
 	Normalize();
 }
 
-unsigned GreatestCommonDivisor(unsigned a, unsigned b)
-{
-	if (a < b)
-	{
-		swap(a, b); 
-	}
-
-	while (a % b != 0)
-	{
-		a = a % b;
-		swap(a, b);
-	}
-
-	return b;
-}
-
 void CRational::Normalize()
 {
-	int greatestCommonDivisor = int(GreatestCommonDivisor(abs(m_numerator), m_denominator));
+	int greatestCommonDivisor = gcd(abs(m_numerator), m_denominator);
 	
 	m_numerator /= greatestCommonDivisor;
 	m_denominator /= greatestCommonDivisor;
+}
+
+void CRational::SetRational(int numerator, int denominator)
+{
+	m_numerator = numerator;
+	m_denominator = denominator;
 }
 
 int CRational::GetNumerator() const
@@ -58,7 +45,7 @@ int CRational::GetNumerator() const
 	return m_numerator;
 }
 
-unsigned CRational::GetDenominator() const
+int CRational::GetDenominator() const
 {
 	return m_denominator;
 }
@@ -71,11 +58,11 @@ double CRational::ToDouble() const
 pair<int, CRational> CRational::ToCompoundFraction() const
 {
 	int whole = m_numerator / int(m_denominator);
-	int remainder = m_numerator % m_denominator;
+	int remainder = m_numerator % int(m_denominator);
 	CRational rational =
 		remainder == 0
 		? CRational()
-		: CRational(abs(remainder), m_denominator);
+		: CRational(remainder, m_denominator);
 
 	return make_pair(whole, rational);
 }
@@ -101,35 +88,11 @@ bool CRational::operator!() const
 
 CRational operator+(CRational const& rational1, CRational const& rational2)
 {
-	int firstNumerator = rational1.GetNumerator();
-	unsigned firstDenomitor = rational1.GetDenominator();
-	int secondNumerator = rational2.GetNumerator();
-	unsigned secondDenominator = rational2.GetDenominator();
+	CRational result;
+	result += rational1;
+	result += rational2;
 
-	if (firstNumerator == 0)
-	{
-		return rational2;
-	}
-
-	if (secondNumerator == 0)
-	{
-		return rational1;
-	}
-	
-	int commonDenomirator = firstDenomitor * secondDenominator;
-	int resultNumerator = (firstNumerator * secondDenominator)
-		+ (secondNumerator * firstDenomitor);
-
-	if (resultNumerator == 0)
-	{
-		return CRational();
-	}
-
-	return CRational
-	(
-		resultNumerator,
-		commonDenomirator
-	);
+	return result;
 }
 
 CRational operator-(CRational const& rational1, CRational const& rational2)
@@ -139,19 +102,19 @@ CRational operator-(CRational const& rational1, CRational const& rational2)
 
 CRational operator*(CRational const& rational1, CRational const& rational2)
 {
-	int firstNumerator = rational1.GetNumerator();
-	unsigned firstDenomitor = rational1.GetDenominator();
-	int secondNumerator = rational2.GetNumerator();
-	unsigned secondDenominator = rational2.GetDenominator();
-
+	int gcdNum1Den2 = gcd(rational1.GetNumerator(), rational2.GetDenominator());
+	int gcdNum2Den1 = gcd(rational2.GetNumerator(), rational1.GetDenominator());
+	int firstNumerator = rational1.GetNumerator() / gcdNum1Den2;
+	int firstDenominator = rational1.GetDenominator() / gcdNum2Den1;
+	int secondNumerator = rational2.GetNumerator() / gcdNum2Den1;
+	int secondDenominator = rational2.GetDenominator() / gcdNum1Den2;
 	int resultNumerator = firstNumerator * secondNumerator;
+	int resultDenominator = firstDenominator * secondDenominator;
 
 	if (resultNumerator == 0)
 	{
 		return CRational();
 	}
-
-	unsigned resultDenominator = firstDenomitor * secondDenominator;
 
 	return CRational
 	(
@@ -164,23 +127,47 @@ CRational operator/(CRational const& rational1, CRational const& rational2)
 {
 	if (!rational2)
 	{
-		throw overflow_error("Divide by zero exception");
+		throw invalid_argument("division by zero");
 	}
 
-	CRational rational2Inverted
+	CRational invertedSecondRational
 	(
 		rational2.GetDenominator(),
 		rational2.GetNumerator()
 	);
 
-	return rational1 * rational2Inverted;
+	return rational1 * invertedSecondRational;
 }
 
-CRational& operator+=(CRational& rational1, CRational const& rational2)
+CRational& CRational::operator+=(CRational const& rational)
 {
-	rational1 = rational1 + rational2;
+	int addendumNumerator = rational.GetNumerator();
+	int addendumDenominator = rational.GetDenominator();
 
-	return rational1;
+	if (this->m_numerator == 0)
+	{
+		this->SetRational(addendumNumerator, addendumDenominator);
+		return *this;
+	}
+
+	if (addendumNumerator == 0)
+	{
+		return *this;
+	}
+
+	int resultDenomirator = this->m_denominator * addendumDenominator;
+	int resultNumerator = (this->m_numerator * addendumDenominator)
+		+ (addendumNumerator * this->m_denominator);
+
+	if (resultNumerator == 0)
+	{
+		this->SetRational(0, 1);
+		return *this;
+	}
+
+	this->SetRational(resultNumerator, resultDenomirator);
+	this->Normalize();
+	return *this;
 }
 
 CRational& operator-=(CRational& rational1, CRational const& rational2)
