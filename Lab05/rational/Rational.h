@@ -19,28 +19,30 @@ public:
 
 	CRational operator+() const;
 	CRational operator-() const;
-	CRational& operator+=(CRational const& rational);
+	CRational& operator+=(CRational const& rhs);
+	CRational& operator-=(CRational const& rhs);
+	CRational& operator*=(CRational const& rhs);
+	CRational& operator/=(CRational const& rhs);
+
 	bool operator!() const;
 
 private:
 	int m_numerator;
 	int m_denominator;
+
 	void SetRational(int numerator, int denominator);
 	void Normalize();
 };
 
-CRational operator+(CRational const& rational1, CRational const& rational2);
-CRational operator-(CRational const& rational1, CRational const& rational2);
-CRational operator*(CRational const& rational1, CRational const& rational2);
-CRational operator/(CRational const& rational1, CRational const& rational2);
-CRational& operator-=(CRational& rational1, CRational const& rational2);
-CRational& operator*=(CRational& rational1, CRational const& rational2);
-CRational& operator/=(CRational& rational1, CRational const& rational2);
-bool operator==(CRational const& rational1, CRational const& rational2);
-bool operator!=(CRational const& rational1, CRational const& rational2);
-bool operator>(CRational const& rational1, CRational const& rational2);
-bool operator>=(CRational const& rational1, CRational const& rational2);
-bool operator<(CRational const& rational1, CRational const& rational2);
-bool operator<=(CRational const& rational1, CRational const& rational2);
-std::ostream& operator<<(std::ostream& output, CRational const& rational);
-std::istream& operator>>(std::istream& input, CRational& rational);
+CRational operator+(CRational lhs, CRational const& rhs);
+CRational operator-(CRational lhs, CRational const& rhs);
+CRational operator*(CRational lhs, CRational const& rhs);
+CRational operator/(CRational lhs, CRational const& rhs);
+bool operator==(CRational const& lhs, CRational const& rhs);
+bool operator!=(CRational const& lhs, CRational const& rhs);
+bool operator>(CRational const& lhs, CRational const& rhs);
+bool operator>=(CRational const& lhs, CRational const& rhs);
+bool operator<(CRational const& lhs, CRational const& rhs);
+bool operator<=(CRational const& lhs, CRational const& rhs);
+std::ostream& operator<<(std::ostream& output, CRational const& rhs);
+std::istream& operator>>(std::istream& input, CRational& rhs);

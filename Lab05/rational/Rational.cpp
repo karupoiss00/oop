@@ -16,20 +16,20 @@ CRational::CRational(int numerator, int denominator)
 	if (denominator == 0)
 	{
 		throw invalid_argument("denominator must be not zero");
-	} 
+	}
 
 	bool isPositive = (numerator * denominator) > 0;
-	
+
 	m_numerator = isPositive ? abs(numerator) : -abs(numerator);
 	m_denominator = abs(denominator);
-	
+
 	Normalize();
 }
 
 void CRational::Normalize()
 {
 	int greatestCommonDivisor = gcd(abs(m_numerator), m_denominator);
-	
+
 	m_numerator /= greatestCommonDivisor;
 	m_denominator /= greatestCommonDivisor;
 }
@@ -38,6 +38,8 @@ void CRational::SetRational(int numerator, int denominator)
 {
 	m_numerator = numerator;
 	m_denominator = denominator;
+
+	Normalize();
 }
 
 int CRational::GetNumerator() const
@@ -86,150 +88,150 @@ bool CRational::operator!() const
 	return m_numerator == 0;
 }
 
-CRational operator+(CRational const& rational1, CRational const& rational2)
+CRational operator+(CRational lhs, CRational const& rhs)
 {
-	CRational result;
-	result += rational1;
-	result += rational2;
+	lhs += rhs;
 
-	return result;
+	return lhs;
 }
 
-CRational operator-(CRational const& rational1, CRational const& rational2)
+CRational operator-(CRational lhs, CRational const& rhs)
 {
-	return rational1 + (-rational2);
+	lhs -= rhs;
+
+	return lhs;
 }
 
-CRational operator*(CRational const& rational1, CRational const& rational2)
+CRational operator*(CRational lhs, CRational const& rhs)
 {
-	int gcdNum1Den2 = gcd(rational1.GetNumerator(), rational2.GetDenominator());
-	int gcdNum2Den1 = gcd(rational2.GetNumerator(), rational1.GetDenominator());
-	int firstNumerator = rational1.GetNumerator() / gcdNum1Den2;
-	int firstDenominator = rational1.GetDenominator() / gcdNum2Den1;
-	int secondNumerator = rational2.GetNumerator() / gcdNum2Den1;
-	int secondDenominator = rational2.GetDenominator() / gcdNum1Den2;
+	lhs *= rhs;
+
+	return lhs;
+}
+
+CRational operator/(CRational lhs, CRational const& rhs)
+{
+	lhs /= rhs;
+
+	return lhs;
+}
+
+CRational& CRational::operator+=(CRational const& rhs)
+{
+	if (m_numerator == 0)
+	{
+		SetRational(rhs.m_numerator, rhs.m_denominator);
+		return *this;
+	}
+
+	if (rhs.m_numerator == 0)
+	{
+		return *this;
+	}
+
+	if (m_denominator == rhs.m_denominator)
+	{
+		SetRational(m_numerator + rhs.m_numerator, m_denominator);
+		return *this;
+	}
+
+	int commonDenominator = lcm(m_denominator, rhs.m_denominator);
+	int firstFactor = commonDenominator / m_denominator;
+	int secondFactor = commonDenominator / rhs.m_denominator;
+	int resultNumerator = m_numerator * firstFactor + rhs.m_numerator * secondFactor;
+
+	if (resultNumerator == 0)
+	{
+		SetRational(0, 1);
+		return *this;
+	}
+
+	SetRational(resultNumerator, commonDenominator);
+
+	return *this;
+}
+
+CRational& CRational::operator-=(CRational const& rhs)
+{
+	return *this += -rhs;
+}
+
+CRational& CRational::operator*=(CRational const& rhs)
+{
+	int gcdNum1Den2 = gcd(m_numerator, rhs.m_denominator);
+	int gcdNum2Den1 = gcd(rhs.m_numerator, m_denominator);
+
+	int firstNumerator = m_numerator / gcdNum1Den2;
+	int firstDenominator = m_denominator / gcdNum2Den1;
+
+	int secondNumerator = rhs.m_numerator / gcdNum2Den1;
+	int secondDenominator = rhs.m_denominator / gcdNum1Den2;
+
 	int resultNumerator = firstNumerator * secondNumerator;
 	int resultDenominator = firstDenominator * secondDenominator;
 
 	if (resultNumerator == 0)
 	{
-		return CRational();
+		SetRational(0, 1);
+
+		return *this;
 	}
 
-	return CRational
-	(
-		resultNumerator,
-		resultDenominator
-	);
+	m_numerator = resultNumerator;
+	m_denominator = resultDenominator;
+
+	return *this;
 }
 
-CRational operator/(CRational const& rational1, CRational const& rational2)
+CRational& CRational::operator/=(CRational const& rhs)
 {
-	if (!rational2)
+	if (!rhs)
 	{
 		throw invalid_argument("division by zero");
 	}
 
-	CRational invertedSecondRational
-	(
-		rational2.GetDenominator(),
-		rational2.GetNumerator()
-	);
-
-	return rational1 * invertedSecondRational;
+	return *this *= { rhs.m_denominator, rhs.m_numerator };
 }
 
-CRational& CRational::operator+=(CRational const& rational)
+bool operator==(CRational const& lhs, CRational const& rhs)
 {
-	int addendumNumerator = rational.GetNumerator();
-	int addendumDenominator = rational.GetDenominator();
-
-	if (this->m_numerator == 0)
-	{
-		this->SetRational(addendumNumerator, addendumDenominator);
-		return *this;
-	}
-
-	if (addendumNumerator == 0)
-	{
-		return *this;
-	}
-
-	int resultDenomirator = this->m_denominator * addendumDenominator;
-	int resultNumerator = (this->m_numerator * addendumDenominator)
-		+ (addendumNumerator * this->m_denominator);
-
-	if (resultNumerator == 0)
-	{
-		this->SetRational(0, 1);
-		return *this;
-	}
-
-	this->SetRational(resultNumerator, resultDenomirator);
-	this->Normalize();
-	return *this;
+	return (lhs.GetNumerator() == rhs.GetNumerator())
+		&& (lhs.GetDenominator() == rhs.GetDenominator());
 }
 
-CRational& operator-=(CRational& rational1, CRational const& rational2)
+bool operator!=(CRational const& lhs, CRational const& rhs)
 {
-	rational1 = rational1 - rational2;
-
-	return rational1;
+	return (lhs.GetNumerator() != rhs.GetNumerator())
+		|| (lhs.GetDenominator() != rhs.GetDenominator());
 }
 
-CRational& operator*=(CRational& rational1, CRational const& rational2)
+bool operator>(CRational const& lhs, CRational const& rhs)
 {
-	rational1 = rational1 * rational2;
-
-	return rational1;
+	return lhs.ToDouble() > rhs.ToDouble();
 }
 
-CRational& operator/=(CRational& rational1, CRational const& rational2)
+bool operator>=(CRational const& lhs, CRational const& rhs)
 {
-	rational1 = rational1 / rational2;
-
-	return rational1;
+	return lhs.ToDouble() >= rhs.ToDouble();
 }
 
-bool operator==(CRational const& rational1, CRational const& rational2)
+bool operator<(CRational const& lhs, CRational const& rhs)
 {
-	return (rational1.GetNumerator() == rational2.GetNumerator())
-		&& (rational1.GetDenominator() == rational2.GetDenominator());
+	return lhs.ToDouble() < rhs.ToDouble();
 }
 
-bool operator!=(CRational const& rational1, CRational const& rational2)
+bool operator<=(CRational const& lhs, CRational const& rhs)
 {
-	return (rational1.GetNumerator() != rational2.GetNumerator())
-		|| (rational1.GetDenominator() != rational2.GetDenominator());
+	return lhs.ToDouble() <= rhs.ToDouble();
 }
 
-bool operator>(CRational const& rational1, CRational const& rational2)
+ostream& operator<<(ostream& output, CRational const& rhs)
 {
-	return rational1.ToDouble() > rational2.ToDouble();
-}
-
-bool operator>=(CRational const& rational1, CRational const& rational2)
-{
-	return rational1.ToDouble() >= rational2.ToDouble();
-}
-
-bool operator<(CRational const& rational1, CRational const& rational2)
-{
-	return rational1.ToDouble() < rational2.ToDouble();
-}
-
-bool operator<=(CRational const& rational1, CRational const& rational2)
-{
-	return rational1.ToDouble() <= rational2.ToDouble();
-}
-
-ostream& operator<<(ostream& output, CRational const& rational)
-{
-	output << rational.GetNumerator() << "/" << rational.GetDenominator();
+	output << rhs.GetNumerator() << "/" << rhs.GetDenominator();
 	return output;
 }
 
-istream& operator>>(istream& input, CRational& rational)
+istream& operator>>(istream& input, CRational& rhs)
 {
 	int numerator;
 	int denumerator;
@@ -239,11 +241,11 @@ istream& operator>>(istream& input, CRational& rational)
 
 	if (delimeter == '/')
 	{
-		rational = CRational(numerator, denumerator);
+		rhs = CRational(numerator, denumerator);
 	}
 	else
 	{
-		throw std::domain_error("failed to parse rational from input");
+		cout << "failed to parse rational from input" << endl;
 	}
 
 	return input;

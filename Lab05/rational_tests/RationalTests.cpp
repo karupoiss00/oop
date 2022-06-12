@@ -1078,14 +1078,17 @@ void ToCompoundFractionTest(CRational rational, int whole, CRational remaindedPa
 TEST_CASE("ToCompoundFraction: whole part < 0")
 {
 	ToCompoundFractionTest(CRational(-5, 4), -1, CRational(-1, 4));
+	ToCompoundFractionTest(CRational(-24, 4), -6, CRational());
 }
 
 TEST_CASE("ToCompoundFraction: whole part = 0")
 {
 	ToCompoundFractionTest(CRational(3, 4), 0, CRational(3, 4));
+	ToCompoundFractionTest(CRational(), 0, CRational());
 }
 
 TEST_CASE("ToCompoundFraction: whole part > 0")
 {
 	ToCompoundFractionTest(CRational(5, 4), 1, CRational(1, 4));
+	ToCompoundFractionTest(CRational(24, 4), 6, CRational());
 }
