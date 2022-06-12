@@ -1,5 +1,4 @@
 #include <iostream>
-#include <optional>
 #include <regex>
 #include <cassert>
 #include "CUrlParsingError.h"
@@ -7,22 +6,20 @@
 
 using namespace std;
 
-string StringToLowerCase(const string& s)
-{
-	string result = s;
-	std::transform(result.begin(), result.end(), result.begin(),
-		[](unsigned char c)
-	{
-		return std::tolower(c);
-	}
-	);
-	return result;
-}
+const Port DEFAULT_HTTP_PORT = 80;
+const Port DEFAULT_HTTPS_PORT = 443;
 
-bool IsValidPort(Port port)
-{
-	return port > 0 && port <= 65535;
-}
+const std::string URL_REGULAR_EXPRESSION = R"(^(https|http)://([\w-]{1,63}(?:\.[\w-]{1,63})*)(?:(?::)(\d{1,5}))?(?:(?:/)([^\s]*))*$)";
+const std::string DOMAIN_REGULAR_EXPRESSION = R"(^([\w-]{1,63}(?:\.[\w-]{1,63})*)$)";
+const std::string DOCUMENT_REGULAR_EXPRESSION = R"(^(((?:\/)*([^\s]*))*)$)";
+
+constexpr unsigned MATCHES_COUNT = 5;
+constexpr unsigned PROTOCOL_MATCH = 1;
+constexpr unsigned HOST_MATCH = 2;
+constexpr unsigned PORT_MATCH = 3;
+constexpr unsigned DOCUMENT_MATCH = 4;
+
+string StringToLowerCase(string s);
 
 CHttpUrl::CHttpUrl(std::string const& url)
 {
@@ -41,9 +38,8 @@ CHttpUrl::CHttpUrl(std::string const& url)
 		throw CUrlParsingError("domain not found");
 	}
 
-	ParseProtocol(matches[PROTOCOL_MATCH]);
-	ParsePort(matches[PORT_MATCH]);
-
+	m_protocol = ParseProtocol(matches[PROTOCOL_MATCH]);
+	m_port = ParsePort(matches[PORT_MATCH]);
 	m_domain = matches[HOST_MATCH];
 	m_document = '/' + matches[DOCUMENT_MATCH].str();
 }
@@ -53,9 +49,9 @@ CHttpUrl::CHttpUrl(string const& domain, string const& document, Protocol protoc
 	m_protocol = protocol;
 	try
 	{
-		ParseDomain(domain);
-		SetPortByProtocol();
-		ParseDocument(document);
+		m_domain = ParseDomain(domain);
+		m_port = MapProtocolToPort(m_protocol);
+		m_document = ParseDocument(document);
 	}
 	catch (exception const& e)
 	{
@@ -74,26 +70,63 @@ CHttpUrl::CHttpUrl(string const& domain, string const& document, Protocol protoc
 	m_port = port;
 }
 
-void CHttpUrl::ParseProtocol(string const& protocol)
+string CHttpUrl::GetURL() const
+{
+	string protocol = MapProtocolToString(m_protocol);
+	bool urlHasCutomPort =
+		m_port != DEFAULT_HTTP_PORT
+		&& m_port != DEFAULT_HTTPS_PORT;
+
+	string url = protocol + "://"s + m_domain;
+
+	if (urlHasCutomPort)
+	{
+		url += ':' + to_string(m_port);
+	}
+
+	url += m_document;
+
+	return url;
+}
+
+string CHttpUrl::GetDomain() const
+{
+	return m_domain;
+}
+
+string CHttpUrl::GetDocument() const
+{
+	return m_document;
+}
+
+Protocol CHttpUrl::GetProtocol() const
+{
+	return m_protocol;
+}
+
+Port CHttpUrl::GetPort() const
+{
+	return m_port;
+}
+
+Protocol CHttpUrl::ParseProtocol(string const& protocol)
 {
 	string caseInsensetiveProtocol = StringToLowerCase(protocol);
 
 	if (caseInsensetiveProtocol == "http")
 	{
-		m_protocol = Protocol::HTTP;
-		return;
+		return Protocol::HTTP;
 	}
 
 	if (caseInsensetiveProtocol == "https")
 	{
-		m_protocol = Protocol::HTTPS;
-		return;
+		return Protocol::HTTPS;
 	}
 
 	throw CUrlParsingError("error while parsing protocol");
 }
 
-void CHttpUrl::ParseDomain(std::string const& domain)
+string CHttpUrl::ParseDomain(std::string const& domain)
 {
 	const regex domainRegExp(DOMAIN_REGULAR_EXPRESSION, std::regex_constants::icase);
 	smatch matches;
@@ -104,42 +137,27 @@ void CHttpUrl::ParseDomain(std::string const& domain)
 		throw CUrlParsingError("invalid domain");
 	}
 
-	m_domain = matches[1];
+	return matches[1];
 }
 
-void CHttpUrl::SetPortByProtocol()
-{
-	switch (m_protocol)
-	{
-	case Protocol::HTTP:
-		m_port = DEFAULT_HTTP_PORT;
-		break;
-	case Protocol::HTTPS:
-		m_port = DEFAULT_HTTPS_PORT;
-		break;
-	default:
-		assert(false);
-	}
-}
-
-void CHttpUrl::ParsePort(string const& port)
+Port CHttpUrl::ParsePort(string const& port)
 {
 	if (port.empty())
 	{
-		SetPortByProtocol();
-		return;
+		return MapProtocolToPort(m_protocol);
 	}
 
 	try
 	{
 		int parsedPort = stoi(port);
+
 		if (!IsValidPort(parsedPort))
 		{
 			throw CUrlParsingError("error while parsing port");
 		}
 		else
 		{
-			m_port = static_cast<Port>(parsedPort);
+			return static_cast<Port>(parsedPort);
 		}
 	}
 	catch (std::exception const&)
@@ -148,7 +166,7 @@ void CHttpUrl::ParsePort(string const& port)
 	}
 }
 
-void CHttpUrl::ParseDocument(std::string const& document)
+string CHttpUrl::ParseDocument(std::string const& document)
 {
 	const regex documentRegExp(DOCUMENT_REGULAR_EXPRESSION, std::regex_constants::icase);
 	smatch matches;
@@ -165,32 +183,26 @@ void CHttpUrl::ParseDocument(std::string const& document)
 		parsedDocument = '/' + parsedDocument;
 	}
 
-	m_document = parsedDocument;
+	return parsedDocument;
 }
 
-std::string CHttpUrl::GetDomain() const
+Port CHttpUrl::MapProtocolToPort(Protocol protocol)
 {
-	return m_domain;
+	switch (protocol)
+	{
+	case Protocol::HTTP:
+		return DEFAULT_HTTP_PORT;
+	case Protocol::HTTPS:
+		return DEFAULT_HTTPS_PORT;
+	default:
+		assert(false);
+		return 0;
+	}
 }
 
-std::string CHttpUrl::GetDocument() const
+string CHttpUrl::MapProtocolToString(Protocol protocol)
 {
-	return m_document;
-}
-
-Protocol CHttpUrl::GetProtocol() const
-{
-	return m_protocol;
-}
-
-Port CHttpUrl::GetPort() const
-{
-	return m_port;
-}
-
-string CHttpUrl::MapProtocolToString() const
-{
-	switch (m_protocol)
+	switch (protocol)
 	{
 	case Protocol::HTTP:
 		return "http";
@@ -202,21 +214,18 @@ string CHttpUrl::MapProtocolToString() const
 	}
 }
 
-string CHttpUrl::GetURL() const
+bool CHttpUrl::IsValidPort(int port)
 {
-	string protocol = MapProtocolToString();
-	bool urlHasCutomPort = 
-		m_port != DEFAULT_HTTP_PORT 
-		&& m_port != DEFAULT_HTTPS_PORT;
+	return port > 0 && port <= 65535;
+}
 
-	string url = protocol + "://"s + m_domain;
-
-	if (urlHasCutomPort)
+string StringToLowerCase(string s)
+{
+	std::transform(s.begin(), s.end(), s.begin(),
+		[](unsigned char c)
 	{
-		url += ':' + to_string(m_port);
+		return std::tolower(c);
 	}
-
-	url += m_document;
-
-	return url;
+	);
+	return s;
 }

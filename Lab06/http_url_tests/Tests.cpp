@@ -13,7 +13,11 @@ struct ExpectedUrlState
 		string const& domain,
 		unsigned short port,
 		string const& document
-	) : m_protocol(protocol), m_document(document), m_domain(domain), m_port(port) {};
+	) : m_protocol(protocol), 
+		m_document(document),
+		m_domain(domain), 
+		m_port(port) 
+	{};
 	
 	void isEqual(CHttpUrl const& url)
 	{
@@ -33,9 +37,7 @@ struct CHttpUrlFixture
 {
 	CHttpUrlFixture(ExpectedUrlState expected, vector<CHttpUrl> recieves)
 		: m_expected(expected), m_recieves(recieves)
-	{
-
-	}
+	{};
 
 	void Test()
 	{
@@ -143,20 +145,20 @@ TEST_CASE("domain parsing")
 		);
 	}
 
-	SECTION("domain as dot")
+	SECTION("domain has invalid chars")
 	{
 		CHECK_THROWS
 		(
 			[]()
 			{
-				CHttpUrl("https://.");
+				CHttpUrl("https://\\");
 			}()
 		);
 		CHECK_THROWS
 		(
 			[]()
 			{
-				CHttpUrl("...", "/");
+				CHttpUrl(":::", "/");
 			}()
 		);
 	}
