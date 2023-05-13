@@ -2,7 +2,6 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
-#include <optional>
 #include "Body.h"
 #include "BodyFactory.h"
 

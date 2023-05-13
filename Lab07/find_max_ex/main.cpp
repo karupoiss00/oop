@@ -12,7 +12,7 @@ struct Athlete
 	{}
 
 	Athlete(string name, double growth, double weight)
-		: m_name(name), m_growth(growth), m_weight(weight)
+		: m_name(move(name)), m_growth(growth), m_weight(weight)
 	{}
 
 	string m_name;
@@ -35,23 +35,33 @@ int main(int argc, char* argv[])
 
 	cout << endl;
 
+	vector<int> v = { 0, 1, 2, 3 };
+
+	int max = 0;
+
+	FindMax(v, max);
+
+	cout << max;
+
 	return 0;
 }
 
 ostream& operator<<(ostream& output, Athlete const& athlete)
 {
 	output << athlete.m_name << endl;
-	output << "Weight: " << athlete.m_weight << "cm" << endl;
-	output << "Growth: " << athlete.m_growth << "kg";
+	output << "Weight: " << athlete.m_weight << "kg" << endl;
+	output << "Growth: " << athlete.m_growth << "cm";
 
 	return output;
 }
 
 void CreateAthletes(vector<Athlete>& athletes)
-{
-	athletes.insert(athletes.end(), Athlete("Ivan Petrov", 180.5, 60));
-	athletes.insert(athletes.end(), Athlete("Pig Petr", 150, 80.7));
-	athletes.insert(athletes.end(), Athlete("Viktor Ivanov", 167.1, 70.3));
+{	
+	athletes = {
+		Athlete("Ivan Petrov", 180.5, 60),
+		Athlete("Pig Petr", 150, 80.7),
+		Athlete("Viktor Ivanov", 167.1, 70.3)
+	};
 }
 
 void PrintMaxWeightAthlete(vector<Athlete> const& athletes)

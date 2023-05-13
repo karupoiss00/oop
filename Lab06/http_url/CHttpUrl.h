@@ -42,11 +42,11 @@ private:
 	std::string m_domain;
 	std::string m_document;
 	Port m_port;
-
+	// сделать статическими либо константными, либо поместить в безымянное пространство
 	Protocol ParseProtocol(std::string const& protocol);
 	std::string ParseDomain(std::string const& domain);
 	Port ParsePort(std::string const& port);
 	std::string ParseDocument(std::string const& document);
 
 	static Port MapProtocolToPort(Protocol protocol);
-};
+};	

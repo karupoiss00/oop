@@ -133,7 +133,7 @@ CRational& CRational::operator+=(CRational const& rhs)
 	{
 		SetRational(m_numerator + rhs.m_numerator, m_denominator);
 		return *this;
-	}
+	}	
 
 	int commonDenominator = lcm(m_denominator, rhs.m_denominator);
 	int firstFactor = commonDenominator / m_denominator;

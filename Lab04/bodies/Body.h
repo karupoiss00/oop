@@ -6,20 +6,23 @@
 class CBody
 {
 public:
+	//enum в данном случае мешает добавлению новых тел
 	CBody(BodyType type);
 
 	virtual double GetDensity() const = 0;
 	virtual double GetVolume() const = 0;
 	virtual double GetMass() const = 0;
-	
+
 	BodyType GetType() const;
+	// выпилить в принципе
 	void SetNestingLevel(unsigned nestingLevel);
 	std::string ToString() const;
 
 	CBody* GetParent() const;
 
+	// как сравнивать полиморфные объектыџ
 	bool operator== (const CBody& body) const;
-	virtual ~CBody();
+	virtual ~CBody(); // = default
 
 protected:
 	static void CallSetParent(CBody* target, CBody* parent);

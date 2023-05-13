@@ -14,8 +14,13 @@ class CList
 			: prev(nullptr), next(nullptr)
 		{
 		}
-
+	
 		Node(const Type& data, NodePointer prev, NodePointer next)
+			: data(data), prev(prev), next(next)
+		{
+		}
+
+		Node(const Type&& data, NodePointer prev, NodePointer next)
 			: data(data), prev(prev), next(next)
 		{
 		}
@@ -34,7 +39,9 @@ public:
 	using ConstReverseIterator = std::reverse_iterator<ConstIterator>;
 
 	CList();
+	CList(const CList& list);
 	~CList();
+	// реализовать move-конструктор
 	
 	Iterator begin();
 	Iterator end();
@@ -56,9 +63,13 @@ public:
 	bool IsEmpty() const;
 
 	void Clear();
+
+	CList<Type>& operator=(const CList<Type> & rhs);
+	ConstIterator& operator=(const Iterator& rhs);
 private:
 	size_t m_size;
 
+// обойтись одним узлом
 	NodePointer m_firstNode;
 	NodePointer m_lastNode;
 };
@@ -72,11 +83,36 @@ CList<Type>::CList()
 }
 
 template <typename Type>
+CList<Type>::CList(const CList& list)
+	: CList()
+{
+	for (auto it = list.cbegin(); it != list.cend(); it++)
+	{
+		// если выбросит исключение
+		PushBack(*it);
+	}
+}
+
+template <typename Type>
 CList<Type>::~CList()
 {
 	Clear();
 	m_firstNode->next = nullptr;
 	m_lastNode->prev = nullptr;
+}
+
+template <typename Type>
+CList<Type>& CList<Type>::operator=(const CList<Type>& rhs)
+{
+	if (std::addressof(rhs) != this)
+	{
+		CList<Type> copy(rhs);
+		std::swap(m_firstNode, copy.m_firstNode);
+		std::swap(m_lastNode, copy.m_lastNode);
+		std::swap(m_size, copy.m_size);
+	}
+
+	return *this;
 }
 
 template <typename Type>

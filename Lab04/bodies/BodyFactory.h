@@ -22,7 +22,7 @@ private:
 	char m_closeDelimiter;
 
 	void CreateActionMap(const std::vector<double>& args, std::istream& strm);
-
+	// vector не удобен универсален
 	body_ptr CreateSphere(const std::vector<double>& args);
 	body_ptr CreateCone(const std::vector<double>& args);
 	body_ptr CreateCylinder(const std::vector<double>& args);

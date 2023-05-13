@@ -1,5 +1,4 @@
 #pragma once
-#include <algorithm>
 #include <vector>
 
 template <typename T, typename Less>
@@ -23,4 +22,15 @@ bool FindMax(std::vector<T> const& arr, T& maxValue, Less const& less)
 	maxValue = arr[maxElementIndex];
 
 	return true;
+}
+
+template <typename T>
+bool FindMax(std::vector<T> const& arr, T& maxValue)
+{
+	auto DefaultComparator = [](T const& lhs, T const& rhs)
+	{
+		return lhs < rhs;
+	};
+
+	return FindMax(arr, maxValue, DefaultComparator);
 }

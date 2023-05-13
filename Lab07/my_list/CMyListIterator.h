@@ -9,11 +9,17 @@ template<typename Type>
 class CList;
 
 template<typename Node, typename Data>
-class CListIterator : public std::iterator<std::bidirectional_iterator_tag, Data>
+class CListIterator
 {
 	template<typename Type>
 	friend class CList;
 public:
+	using iterator_category = std::bidirectional_iterator_tag;
+	using difference_type = std::ptrdiff_t;
+	using value_type = Data;
+	using pointer = Data*;
+	using reference = Data&;
+
 	Data& operator*() const;
 	Data* operator->() const;
 
@@ -25,7 +31,7 @@ public:
 
 	CListIterator operator++(int);
 	CListIterator operator--(int);
-
+	CListIterator<Node, const Data>& operator=(const CListIterator<Node, Data>& rhs);
 private:
 	CListIterator(Node* value);
 
@@ -36,6 +42,12 @@ template <typename Node, typename Data>
 CListIterator<Node, Data>::CListIterator(Node* value)
 	: m_pNode(value)
 {}
+template <typename Node, typename Data>
+CListIterator<Node, const Data>& CListIterator<Node, Data>::operator=(const CListIterator<Node, Data>& rhs)
+{
+	m_pNode = rhs.m_pNode;
+	return *tmp;
+}
 
 template <typename Node, typename Data>
 bool CListIterator<Node, Data>::operator==(const CListIterator& it) const

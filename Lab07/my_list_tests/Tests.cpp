@@ -4,6 +4,22 @@
 
 using namespace std;
 
+template<typename Type>
+void CheckListsEquality(const CList<Type>& lhs, const CList<Type> rhs)
+{
+	auto lhsIt = lhs.cbegin();
+	auto rhsIt = rhs.cbegin();
+
+	REQUIRE(lhs.GetSize() == rhs.GetSize());
+
+	while (lhsIt != lhs.cend())
+	{
+		CHECK(*lhsIt == *rhsIt);
+		lhsIt++;
+		rhsIt++;
+	}
+}
+
 struct ListFixture
 {
 	CList<string> list;
@@ -22,6 +38,18 @@ TEST_CASE_METHOD(ListFixture, "List of strings")
 		{
 			CHECK(!list.GetSize());
 		}
+	}
+
+	WHEN("copied")
+	{
+		CList<string> copy(list);
+		REQUIRE(copy.GetSize() == 0);
+	}
+
+	WHEN("assigned")
+	{
+		CList<string> copy = list;
+		REQUIRE(copy.GetSize() == 0);
 	}
 }
 
@@ -75,7 +103,7 @@ TEST_CASE_METHOD(ListFilledFixture, "iterator returns")
 	SECTION("begin")
 	{
 		CList<string>::Iterator it = list.begin();
-
+		CList<string>::ConstIterator ñit = list.cbegin();
 		CHECK(*it == "first");
 		++it;
 		CHECK(*it == "second");
@@ -150,6 +178,21 @@ TEST_CASE_METHOD(ListFilledFixture, "iterator returns")
 		CHECK(*it == "first");
 		--it;
 		CHECK(*it == "second");
+	}
+
+	WHEN("copied")
+	{
+		CList<string> copy(list);
+		
+		CheckListsEquality(list, copy);
+	}
+
+	WHEN("assigned")
+	{
+		CList<string> copy;
+		copy = list;
+		
+		CheckListsEquality(list, copy);
 	}
 }
 
