@@ -201,6 +201,14 @@ TEST_CASE("operators overloaded")
 			REQUIRE(!(str2 < str1));
 		}
 
+		SECTION("substr less than")
+		{
+			CString str1("12345");
+			CString str2("123456");
+
+			REQUIRE(str1 < str2);
+		}
+
 		SECTION("less than or equal to")
 		{
 			CString str1("12345");
@@ -219,6 +227,14 @@ TEST_CASE("operators overloaded")
 
 			REQUIRE(str2 > str1);
 			REQUIRE(!(str1 >  str2));
+		}
+
+		SECTION("greater than substr")
+		{
+			CString str1("12345");
+			CString str2("123456");
+
+			REQUIRE(str2 > str1);
 		}
 
 		SECTION("greater than or equal to")
