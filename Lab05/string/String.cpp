@@ -4,48 +4,48 @@
 
 using namespace std;
 
-CString::CString()
-	: m_length(0), m_chars(new char[1])
+// [Solved] делать зависимости между пол€ми класс не€вными - нехорошо
+CString::CString(const char* chars, size_t length)
+	: m_chars(new char[length + 1]), m_length(length)
 {
-	SetChars("");
+	assert(chars != nullptr);
+	assert(m_chars != nullptr);
+
+	if (chars != nullptr)
+	{
+		memcpy(m_chars, chars, length);
+		m_chars[length] = '\0';
+	}
 }
+
+CString::CString()
+	: CString("", 0)
+{}
 
 CString::CString(const char* chars)
-	: m_length(strlen(chars)), m_chars(new char[m_length + 1])
-{
-	SetChars(chars);
-}
+	// [Solved] delegating contructor
+	: CString(chars, strlen(chars))	
+{}
 
-CString::CString(const char* chars, size_t length)
-	: m_length(length), m_chars(new char[m_length + 1])
-{
-	SetChars(chars);
-}
+CString::CString(std::string const& stlString)
+	: CString(stlString.c_str())
+{}
+
+CString::CString(size_t length)
+	: m_chars(new char[length + 1]), m_length(length)
+{}
 
 CString::CString(CString const& other)
-	: m_length(other.m_length), m_chars(new char[m_length + 1])
-{
-	SetChars(other.GetStringData());
-}
+	: CString(other.GetStringData())
+{}
 
-CString::CString(CString&& other)
+CString::CString(CString&& other) noexcept
 {
 	m_chars = other.m_chars;
 	m_length = other.m_length;
 
 	other.m_chars = nullptr;
 	other.m_length = 0;
-}
-
-CString::CString(std::string const& stlString)
-	: m_length(stlString.size()), m_chars(new char[m_length + 1])
-{
-	SetChars(stlString.c_str());
-}
-
-CString::CString(size_t length)
-	: m_length(length), m_chars(new char[m_length + 1])
-{
 }
 
 CString::~CString()
@@ -90,17 +90,8 @@ CString CString::SubString(size_t start, size_t length) const
 	return CString(&m_chars[start], length);
 }
 
-void CString::SetChars(const char* chars)
-{
-	assert(chars != nullptr);
-	assert(m_chars != nullptr);
-
-	if (chars != nullptr)
-	{
-		memcpy(m_chars, chars, m_length);
-		m_chars[m_length] = '\0';
-	}
-}
+// [Solved] написать комментарий, либо €вно передавать длину
+// ћетод SetChars был удален за ненадобностью
 
 CString& CString::operator=(const CString& str)
 {
@@ -115,7 +106,7 @@ CString& CString::operator=(const CString& str)
 	return *this;
 }
 
-CString& CString::operator=(CString&& str)
+CString& CString::operator=(CString&& str) noexcept
 {
 	if (this != &str)
 	{
@@ -171,11 +162,21 @@ int CString::Compare(const CString& str) const
 
 bool CString::operator==(const CString& str) const
 {
+	// [Solved] оптимизаци€: если длины не равны, можно не сравниватть содержимое
+	if (this->m_length != str.m_length)
+	{
+		return false;
+	}
 	return Compare(str) == 0;
 }
 
 bool CString::operator!=(const CString& str) const
 {
+	// [Solved] оптимизаци€: если длины не равны, можно не сравниватть содержимое
+	if (this->m_length != str.m_length)
+	{
+		return true;
+	}
 	return Compare(str) != 0;
 }
 

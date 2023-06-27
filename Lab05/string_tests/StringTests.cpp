@@ -174,7 +174,7 @@ TEST_CASE("operators overloaded")
 	{
 		CString str1("12345");
 		CString str2("12345");
-		CString str3("67890");
+		CString str3("67890s");
 
 		REQUIRE(str1 == str2);
 		REQUIRE(!(str1 == str3));
@@ -184,7 +184,7 @@ TEST_CASE("operators overloaded")
 	{
 		CString str1("12345");
 		CString str2("12345");
-		CString str3("67890");
+		CString str3("67890s");
 
 		REQUIRE(str1 != str3);
 		REQUIRE(!(str1 != str2));

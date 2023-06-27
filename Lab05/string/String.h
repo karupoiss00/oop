@@ -9,7 +9,7 @@ public:
 	CString(const char* pString);
 	CString(const char* pString, size_t length);
 	CString(CString const& other);
-	CString(CString&& other);
+	CString(CString&& other) noexcept;
 	CString(std::string const& stlString);
 
 	~CString();
@@ -20,7 +20,7 @@ public:
 	void Clear();
 
 	CString& operator=(const CString& str);
-	CString& operator=(CString&& str);
+	CString& operator=(CString&& str) noexcept;
 
 	CString operator+(const CString& str) const;
 	CString& operator+=(const CString& str);
@@ -35,7 +35,6 @@ public:
 private:
 	explicit CString(size_t length);
 
-	void SetChars(const char* chars);
 	int Compare(const CString& str) const;
 
 	size_t m_length;
