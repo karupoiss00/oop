@@ -138,6 +138,8 @@ template <typename Type>
 CList<Type>::~CList()
 {
 	Clear();
+	delete m_firstNode;
+	delete m_lastNode;
 	m_firstNode->next = nullptr;
 	m_lastNode->prev = nullptr;
 }
