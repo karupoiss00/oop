@@ -244,3 +244,11 @@ TEST_CASE_METHOD(ListFixture, "remove all elements")
 	CHECK(list.IsEmpty());
 	CHECK(list.GetSize() == 0);
 }
+
+TEST_CASE_METHOD(ListFixture, "move constructor")
+{
+	CList movedList(std::move(list));
+
+	CHECK(list.IsEmpty());
+	CHECK(list.GetSize() == 0);
+}

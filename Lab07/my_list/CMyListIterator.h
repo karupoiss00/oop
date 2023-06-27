@@ -31,7 +31,7 @@ public:
 
 	CListIterator operator++(int);
 	CListIterator operator--(int);
-	CListIterator<Node, const Data>& operator=(const CListIterator<Node, Data>& rhs);
+	CListIterator<Node, Data>& operator=(const CListIterator<Node, Data>& rhs);
 private:
 	CListIterator(Node* value);
 
@@ -43,10 +43,10 @@ CListIterator<Node, Data>::CListIterator(Node* value)
 	: m_pNode(value)
 {}
 template <typename Node, typename Data>
-CListIterator<Node, const Data>& CListIterator<Node, Data>::operator=(const CListIterator<Node, Data>& rhs)
+CListIterator<Node, Data>& CListIterator<Node, Data>::operator=(const CListIterator<Node, Data>& rhs)
 {
 	m_pNode = rhs.m_pNode;
-	return *tmp;
+	return *this;
 }
 
 template <typename Node, typename Data>
@@ -77,7 +77,7 @@ template <typename Node, typename Data>
 CListIterator<Node, Data>& CListIterator<Node, Data>::operator--()
 {
 	assert(m_pNode->prev != nullptr);
-	m_pNode = m_pNode->prev.get();
+	m_pNode = m_pNode->prev;
 	return *this;
 }
 
@@ -85,7 +85,7 @@ template <typename Node, typename Data>
 CListIterator<Node, Data>& CListIterator<Node, Data>::operator++()
 {
 	assert(m_pNode->next != nullptr);
-	m_pNode = m_pNode->next.get();
+	m_pNode = m_pNode->next;
 	return *this;
 }
 

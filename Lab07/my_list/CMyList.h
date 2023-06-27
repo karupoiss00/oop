@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <optional>
 #include "CMyListIterator.h"
 
@@ -6,7 +7,7 @@ template<typename Type>
 class CList
 {
 	struct Node;
-	using NodePointer = std::shared_ptr<Node>;
+	using NodePointer = Node*;
 	
 	struct Node
 	{
@@ -27,8 +28,8 @@ class CList
 
 		std::optional<Type> data;
 
-		std::shared_ptr<Node> prev;
-		std::shared_ptr<Node> next;
+		Node* prev;
+		Node* next;
 	};
 
 public:
@@ -40,9 +41,10 @@ public:
 
 	CList();
 	CList(const CList& list);
+	// [Solved] реализовать move-конструктор
+	CList(CList&& list);
 	~CList();
-	// реализовать move-конструктор
-	
+
 	Iterator begin();
 	Iterator end();
 	ConstIterator cbegin() const;
@@ -69,17 +71,48 @@ public:
 private:
 	size_t m_size;
 
-// обойтись одним узлом
 	NodePointer m_firstNode;
 	NodePointer m_lastNode;
 };
 
 template <typename Type>
 CList<Type>::CList()
-	: m_size(0), m_firstNode(std::make_shared<Node>()), m_lastNode(std::make_shared<Node>())
+	: m_size(0)
 {
-	m_firstNode->next = m_lastNode;
-	m_lastNode->prev = m_firstNode;
+	try
+	{
+		m_firstNode = new Node();
+		m_lastNode = new Node();
+		m_firstNode->next = m_lastNode;
+		m_lastNode->prev = m_firstNode;
+	}
+	catch (std::exception const& e)
+	{
+		std::cout << e.what() << std::endl;
+		throw e;
+	}
+}
+
+template <typename Type>
+CList<Type>::CList(CList&& list)
+	: m_size(list.m_size)
+{
+	m_firstNode = list.m_firstNode;
+	m_lastNode = list.m_lastNode;
+
+	try
+	{
+		list.m_firstNode = new Node();
+		list.m_lastNode = new Node();
+		list.m_firstNode->next = list.m_lastNode;
+		list.m_lastNode->prev = list.m_firstNode;
+		list.m_size = 0;
+	}
+	catch (std::exception const& e)
+	{
+		std::cout << e.what() << std::endl;
+		throw e;
+	}
 }
 
 template <typename Type>
@@ -88,8 +121,16 @@ CList<Type>::CList(const CList& list)
 {
 	for (auto it = list.cbegin(); it != list.cend(); it++)
 	{
-		// если выбросит исключение
-		PushBack(*it);
+		try
+		{
+			// [Solved] если выбросит исключение
+			PushBack(*it);
+		}
+		catch (std::exception const& e)
+		{
+			std::cout << e.what() << std::endl;
+			throw e;
+		}
 	}
 }
 
@@ -123,10 +164,10 @@ void CList<Type>::Clear()
 	while (node->next != nullptr)
 	{
 		m_firstNode->next = node->next;
-		node->next->prev = m_firstNode;
-
+		
 		node->prev = nullptr;
 		node->next = nullptr;
+		delete node;
 
 		node = m_firstNode->next;
 	}
@@ -137,25 +178,25 @@ void CList<Type>::Clear()
 template <typename Type>
 typename CList<Type>::Iterator CList<Type>::begin()
 {
-	return Iterator(m_firstNode->next.get());
+	return Iterator(m_firstNode->next);
 }
 
 template <typename Type>
 typename CList<Type>::Iterator CList<Type>::end()
 {
-	return Iterator(m_lastNode.get());
+	return Iterator(m_lastNode);
 }
 
 template <typename Type>
 typename CList<Type>::ConstIterator CList<Type>::cbegin() const
 {
-	return ConstIterator(m_firstNode->next.get());
+	return ConstIterator(m_firstNode->next);
 }
 
 template <typename Type>
 typename CList<Type>::ConstIterator CList<Type>::cend() const
 {
-	return ConstIterator(m_lastNode.get());
+	return ConstIterator(m_lastNode);
 }
 
 template <typename Type>
@@ -185,7 +226,7 @@ typename CList<Type>::ConstReverseIterator CList<Type>::rcend() const
 template <typename Type>
 typename CList<Type>::Iterator CList<Type>::Insert(Iterator const& pos, Type const& data)
 {
-	auto newNode = std::make_shared<Node>(data, nullptr, nullptr);
+	auto newNode = new Node(data, nullptr, nullptr);
 
 	NodePointer beforeNew = pos.m_pNode->prev;
 	NodePointer afterNew = beforeNew->next;
@@ -198,7 +239,7 @@ typename CList<Type>::Iterator CList<Type>::Insert(Iterator const& pos, Type con
 
 	++m_size;
 
-	return Iterator(newNode.get());
+	return Iterator(newNode);
 }
 
 template <typename Type>
@@ -215,13 +256,13 @@ typename CList<Type>::Iterator CList<Type>::Erase(Iterator const& pos)
 
 	--m_size;
 
-	return Iterator(afterPos.get());
+	return Iterator(afterPos);
 }
 
 template <typename Type>
 void CList<Type>::PushFront(const Type& data)
 {
-	auto newNode = std::make_shared<Node>(data, m_firstNode, m_firstNode->next);
+	auto newNode = new Node(data, m_firstNode, m_firstNode->next);
 
 	m_firstNode->next = newNode;
 	newNode->next->prev = newNode;
@@ -232,7 +273,7 @@ void CList<Type>::PushFront(const Type& data)
 template <typename Type>
 void CList<Type>::PushBack(const Type& data)
 {
-	auto newNode = std::make_shared<Node>(data, m_lastNode->prev, m_lastNode);
+	auto newNode = new Node(data, m_lastNode->prev, m_lastNode);
 
 	m_lastNode->prev = newNode;
 	newNode->prev->next = newNode;
@@ -249,5 +290,5 @@ size_t CList<Type>::GetSize() const
 template <typename Type>
 bool CList<Type>::IsEmpty() const
 {
-	return m_firstNode->next == m_lastNode;
+	return m_size == 0;
 }
