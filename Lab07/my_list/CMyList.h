@@ -1,35 +1,39 @@
 #pragma once
-#include <iostream>
-#include <optional>
+#include <memory>
 #include "CMyListIterator.h"
 
 template<typename Type>
 class CList
 {
 	struct Node;
+	// [Solved] использовать обычные указатели
 	using NodePointer = Node*;
 	
-	struct Node
+	struct Node 
 	{
-		Node()
-			: prev(nullptr), next(nullptr)
+		template <typename U>
+		void Create(U&& value, NodePointer prev_, NodePointer next_)
 		{
-		}
-	
-		Node(const Type& data, NodePointer prev, NodePointer next)
-			: data(data), prev(prev), next(next)
-		{
+			next = next_;
+			prev = prev_;
+			std::construct_at(&GetValue(), std::forward<U>(value));
 		}
 
-		Node(const Type&& data, NodePointer prev, NodePointer next)
-			: data(data), prev(prev), next(next)
+		void Destroy()
 		{
+			prev = nullptr;
+			next = nullptr;
+			std::destroy_at(&GetValue());
 		}
 
-		std::optional<Type> data;
+		Type& GetValue()
+		{
+			return *reinterpret_cast<Type*> (buffer);
+		}
 
-		Node* prev;
-		Node* next;
+		alignas(Type) char buffer[sizeof(Type)];
+		NodePointer next;
+		NodePointer prev;
 	};
 
 public:
@@ -86,10 +90,11 @@ CList<Type>::CList()
 		m_firstNode->next = m_lastNode;
 		m_lastNode->prev = m_firstNode;
 	}
-	catch (std::exception const& e)
+	catch (...)
 	{
-		std::cout << e.what() << std::endl;
-		throw e;
+		delete m_firstNode;
+		delete m_lastNode;
+		throw;
 	}
 }
 
@@ -106,12 +111,12 @@ CList<Type>::CList(CList&& list)
 		list.m_lastNode = new Node();
 		list.m_firstNode->next = list.m_lastNode;
 		list.m_lastNode->prev = list.m_firstNode;
-		list.m_size = 0;
 	}
-	catch (std::exception const& e)
-	{
-		std::cout << e.what() << std::endl;
-		throw e;
+	catch (...)
+	{ 
+		delete list.m_firstNode;
+		delete list.m_lastNode;
+		throw;
 	}
 }
 
@@ -126,10 +131,10 @@ CList<Type>::CList(const CList& list)
 			// [Solved] если выбросит исключение
 			PushBack(*it);
 		}
-		catch (std::exception const& e)
+		catch (...)
 		{
-			std::cout << e.what() << std::endl;
-			throw e;
+			Clear();
+			throw;
 		}
 	}
 }
@@ -167,8 +172,7 @@ void CList<Type>::Clear()
 	{
 		m_firstNode->next = node->next;
 		
-		node->prev = nullptr;
-		node->next = nullptr;
+		node->Destroy();
 		delete node;
 
 		node = m_firstNode->next;
@@ -228,7 +232,16 @@ typename CList<Type>::ConstReverseIterator CList<Type>::rcend() const
 template <typename Type>
 typename CList<Type>::Iterator CList<Type>::Insert(Iterator const& pos, Type const& data)
 {
-	auto newNode = new Node(data, nullptr, nullptr);
+	try
+	{
+		auto newNode = new Node();
+	}
+	catch (...)
+	{
+		delete newNode;
+		throw;
+	}
+	newNode->Create(data, nullptr, nullptr);
 
 	NodePointer beforeNew = pos.m_pNode->prev;
 	NodePointer afterNew = beforeNew->next;
@@ -264,7 +277,16 @@ typename CList<Type>::Iterator CList<Type>::Erase(Iterator const& pos)
 template <typename Type>
 void CList<Type>::PushFront(const Type& data)
 {
-	auto newNode = new Node(data, m_firstNode, m_firstNode->next);
+	try
+	{
+		auto newNode = new Node();
+	}
+	catch (...)
+	{
+		delete newNode;
+		throw;
+	}
+	newNode->Create(data, m_firstNode, m_firstNode->next);
 
 	m_firstNode->next = newNode;
 	newNode->next->prev = newNode;
@@ -275,7 +297,18 @@ void CList<Type>::PushFront(const Type& data)
 template <typename Type>
 void CList<Type>::PushBack(const Type& data)
 {
-	auto newNode = new Node(data, m_lastNode->prev, m_lastNode);
+	try
+	{
+		auto newNode = new Node();
+	}
+	catch (...)
+	{
+		delete newNode;
+		throw;
+	}
+
+	
+	newNode->Create(data, m_lastNode->prev, m_lastNode);
 
 	m_lastNode->prev = newNode;
 	newNode->prev->next = newNode;

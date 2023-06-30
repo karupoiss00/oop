@@ -41,8 +41,8 @@ private:
 	char* m_chars;
 };
 
-const CString operator+(const std::string& stlString, const CString& str);
-const CString operator+(const char* chars, const CString& str);
+CString operator+(const std::string& stlString, const CString& str);
+CString operator+(const char* chars, const CString& str);
 
 std::ostream& operator<<(std::ostream& strm, CString const& str);
 std::istream& operator>>(std::istream& strm, CString& str);

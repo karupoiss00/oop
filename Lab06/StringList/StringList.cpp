@@ -30,9 +30,7 @@ CStringList::CStringList(CStringList&& list)
 	{
 		list.m_firstNode = new Node();
 		list.m_lastNode = new Node();
-		list.m_firstNode->next = list.m_lastNode;
-		list.m_lastNode->prev = list.m_firstNode;
-		list.m_size = 0;
+		
 	}
 	catch (std::exception const& e)
 	{

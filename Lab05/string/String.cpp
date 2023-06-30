@@ -10,11 +10,15 @@ CString::CString(const char* chars, size_t length)
 {
 	assert(chars != nullptr);
 	assert(m_chars != nullptr);
-
+	// бросать исключение, если был передан null-pointer
 	if (chars != nullptr)
 	{
 		memcpy(m_chars, chars, length);
 		m_chars[length] = '\0';
+	}
+	else
+	{
+		throw std::invalid_argument("chars is NULL");
 	}
 }
 
@@ -28,7 +32,8 @@ CString::CString(const char* chars)
 {}
 
 CString::CString(std::string const& stlString)
-	: CString(stlString.c_str())
+	: CString(stlString.c_str(), stlString.size())
+	// а если в stl-строке будет символ с кодом 0
 {}
 
 CString::CString(size_t length)
@@ -36,7 +41,8 @@ CString::CString(size_t length)
 {}
 
 CString::CString(CString const& other)
-	: CString(other.GetStringData())
+	: CString(other.GetStringData(), other.GetLength())
+	// а если в строке будет символ с кодом 0
 {}
 
 CString::CString(CString&& other) noexcept
@@ -199,13 +205,13 @@ bool CString::operator>=(const CString& str) const
 {
 	return Compare(str) >= 0;
 }
-
-const CString operator+(const string& stlString, const CString& str)
+// возвращаеть неконстантную строку
+CString operator+(const string& stlString, const CString& str)
 {
 	return CString(stlString) + str;
 }
 
-const CString operator+(const char* chars, const CString& str)
+CString operator+(const char* chars, const CString& str)
 {
 	return CString(chars) + str;
 }

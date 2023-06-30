@@ -64,13 +64,13 @@ bool CListIterator<Node, Data>::operator!=(const CListIterator& it) const
 template <typename Node, typename Data>
 Data& CListIterator<Node, Data>::operator*() const
 {
-	return m_pNode->data.value();
+	return m_pNode->GetValue();
 }
 
 template <typename Node, typename Data>
 Data* CListIterator<Node, Data>::operator->() const
 {
-	return *m_pNode->data;
+	return *m_pNode->GetValue();
 }
 
 template <typename Node, typename Data>
