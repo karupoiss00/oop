@@ -30,14 +30,15 @@ public:
 private:
 	bool IsFunction(std::string const& name) const;
 	bool IsIdentifierDefined(std::string const& name) const;
+	// статический метод должен быть
 	bool IsValidIdentifier(std::string const& identifier) const;
-
-	void ThrowAlreadyDefinedIdentifier(std::string const& identifier) const;
+	// нужно использовать атрибут noreturn
+	[[noreturn]] void ThrowAlreadyDefinedIdentifier(std::string const& identifier) const;
 	void ThrowUndefinedIdentifier(std::string const& identifier) const;
 	void ThrowIdentifierIsFunction(std::string const& identifier) const;
 
 	float DoOperation(std::string const& lhsIdentifier, std::string const& rhsIdentifier, Operation operation) const;
 
-	std::map<std::string, float, std::greater<std::string>> m_variables;
-	std::map<std::string, std::function<float()>, std::greater<std::string>> m_functions;
+	std::map<std::string, float, std::less<std::string>> m_variables;
+	std::map<std::string, std::function<float()>, std::less<std::string>> m_functions;
 };

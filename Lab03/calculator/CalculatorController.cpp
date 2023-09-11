@@ -1,5 +1,6 @@
 #include <string>
 #include <cassert>
+#include <iomanip>
 #include "CalculatorController.h"
 
 using namespace std;
@@ -34,11 +35,25 @@ Operation CalculatorController::MapCharToOperation(char ch) const
 	}
 }
 
-void PrepareExpression(string& expression)
+void CalculatorController::PrepareExpression(string& expression)
 {
 	expression.erase(remove_if(expression.begin(), expression.end(), ::isspace), expression.end());
 }
 
+string CalculatorController::GetIdentifierValue(string const& identifier)
+{
+	float value = m_calculator.GetIdentifierValue(identifier);
+
+	if (isnan(value))
+	{
+		return "nan";
+	}
+	
+	stringstream stream;
+	stream << std::fixed << std::setprecision(2) << value;
+
+	return stream.str();
+}
 bool CalculatorController::HandleCommand()
 {
 	string commandLine;
@@ -168,14 +183,14 @@ void CalculatorController::PrintIdentifierValue(string expression)
 	stringstream input(expression);
 	input >> identifier;
 
-	m_output << m_calculator.GetIdentifierValue(identifier) << endl;
+	m_output << GetIdentifierValue(identifier) << endl;
 };
 
 void CalculatorController::PrintVariables(string expression)
 {
 	for (auto fnName : m_calculator.GetVariablesList())
 	{
-		m_output << fnName << ":" << m_calculator.GetIdentifierValue(fnName) << endl;
+		m_output << fnName << ":" << GetIdentifierValue(fnName) << endl;
 	}
 };
 
@@ -183,6 +198,6 @@ void CalculatorController::PrintFunctions(string expression)
 {
 	for (auto fnName : m_calculator.GetFunctionsList())
 	{
-		m_output << fnName << ":" << m_calculator.GetIdentifierValue(fnName) << endl;
+		m_output << fnName << ":" << GetIdentifierValue(fnName) << endl;
 	}
 };

@@ -43,7 +43,7 @@ void Calculator::AssignVariable(string const& lhsVariableName, float value)
 {
 	if (!IsValidIdentifier(lhsVariableName))
 	{
-		throw invalid_argument(lhsVariableName + " contains not allowed chars");
+		throw invalid_argument(lhsVariableName + " is invalid identifier");
 	}
 
 	if (IsFunction(lhsVariableName))
@@ -76,7 +76,7 @@ void Calculator::DefineVariable(string const& variableName)
 
 void Calculator::DefineFunction(string const& functionName, string const& rhsIdentifier)
 {
-	if (IsIdentifierDefined(functionName) && !IsFunction(functionName))
+	if (IsIdentifierDefined(functionName))
 	{
 		ThrowAlreadyDefinedIdentifier(functionName);
 	}
@@ -88,6 +88,11 @@ void Calculator::DefineFunction(string const& functionName, string const& rhsIde
 
 void Calculator::DefineFunction(string const& functionName, string const& lhsIdentifier, string const& rhsIdentifier, Operation operation)
 {
+	if (IsIdentifierDefined(functionName))
+	{
+		ThrowAlreadyDefinedIdentifier(functionName);
+	}
+
 	if (!IsIdentifierDefined(lhsIdentifier))
 	{
 		ThrowUndefinedIdentifier(lhsIdentifier);
@@ -153,7 +158,7 @@ float Calculator::GetIdentifierValue(string const& identifier) const
 
 	if (IsFunction(identifier))
 	{
-		auto fn = m_functions.find(identifier)->second;
+		auto& fn = m_functions.find(identifier)->second;
 
 		return fn();
 	}

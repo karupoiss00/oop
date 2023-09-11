@@ -3,6 +3,8 @@
 
 using namespace std;
 
+// дописать тест на зацикливание функции (её переопределение)
+
 void CheckVariablesList(Calculator const& calculator, map<string, float> const& expectedVariables)
 {
 	auto varList = calculator.GetVariablesList();

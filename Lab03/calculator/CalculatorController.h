@@ -24,7 +24,8 @@ private:
 
 	Operation MapCharToOperation(char ch) const;
 	size_t GetOperationCharacterPos(std::string const& expression);
-	void PrepareExpression(string& expression);
+	void PrepareExpression(std::string& expression);
+	std::string GetIdentifierValue(std::string const& expression);
 
 	using ActionMap = std::map<std::string, std::function<void(std::string expression)>>;
 
