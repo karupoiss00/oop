@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 
+
+
 // гарантия безопасности
 
 template <typename T, typename Less>

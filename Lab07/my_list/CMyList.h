@@ -14,6 +14,7 @@ class CList
 		template <typename U>
 		void Create(U&& value, NodePointer prev_, NodePointer next_)
 		{
+			// лучше вынести присваивание узлов в конструктор
 			next = next_;
 			prev = prev_;
 			std::construct_at(&GetValue(), std::forward<U>(value));
@@ -83,6 +84,9 @@ template <typename Type>
 CList<Type>::CList()
 	: m_size(0)
 {
+	// можно написать в тестах класс, который будет выкидывать исключения
+	// 	   при этом нужно считать количество вызовов деструкторов
+	// вынести в базовый класс работу с указателями
 	try
 	{
 		m_firstNode = new Node();
@@ -93,6 +97,7 @@ CList<Type>::CList()
 	catch (...)
 	{
 		delete m_firstNode;
+		// попытка удалить неинициализированный указатель
 		delete m_lastNode;
 		throw;
 	}

@@ -5,6 +5,12 @@
 
 using namespace std;
 
+struct Student
+{
+	std::string name;
+	std::string surname;
+};
+
 struct Athlete
 {
 	Athlete()
